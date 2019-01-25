@@ -32,7 +32,7 @@ class EditUnitDialog(wx.Dialog):
                      0, wx.ALIGN_CENTER | wx.EXPAND | wx.ALL, 1)
         self.nameBox = wx.TextCtrl(self)
         innerBox.Add(self.nameBox, 1, wx.ALIGN_CENTER | wx.EXPAND | wx.ALL, 1)
-        innerBox.Add(wx.StaticText(self, 0, "PC?"),
+        innerBox.Add(wx.StaticText(self, 0, "Is PC"),
                      0, wx.ALIGN_CENTER | wx.EXPAND | wx.ALL, 1)
         self.pcBox = wx.CheckBox(self)
         innerBox.Add(self.pcBox, 0, wx.ALIGN_CENTER | wx.EXPAND | wx.ALL, 1)
@@ -104,13 +104,7 @@ class EditUnitDialog(wx.Dialog):
 class MainFrame(wx.Frame):
     def __init__(self, parent):
         wx.Frame.__init__(self, parent, title = "DM Helper", style = wx.DEFAULT_FRAME_STYLE)
-        self.units = [
-            Unit('Gideon', True, 15, 14, 10, "Max's PC"),
-            Unit('Mahlea', True, 9, 18, 11, "Emahlea's PC"),
-            Unit('Alionn Mo Stor', True, 17, 14, 9, "Dayla's PC"),
-            Unit('Goblin A', False, 10, 8, 4, "Left side; here's some really long text blah blach blach dolor sit amet"),
-            Unit('Goblin B', False, 10.1, 8, 7, "Right side")
-        ] #TODO
+        self.units = []
 
         self.SetMinSize((800, 600))
         self.SetSize((800, 600))
@@ -187,6 +181,8 @@ class MainFrame(wx.Frame):
         self.refreshMgmt()
 
     def cycleUnits(self):
+        if len(units) == 0: return
+
         unit = self.units[0]
         self.units.remove(self.units[0])
         self.units.append(unit)
