@@ -1,11 +1,7 @@
-import os, random, time
-import wx
+import wx, os
 
 class Unit:
-    counter = 1
-
     def __init__(self, name = "", pc = True, initiative = 0, ac = 0, hp = 0, notes = ""):
-        self.ident = Unit.nextCounter()
         self.name = name
         self.pc = pc
         self.initiative = initiative
@@ -13,11 +9,13 @@ class Unit:
         self.hp = hp
         self.notes = notes
 
-    @staticmethod
-    def nextCounter():
-        ident = Unit.counter
-        Unit.counter = Unit.counter + 1
-        return ident
+    def __str__(self):
+        if self.pc: s = 'PC'
+        else: s = 'NPC'
+        s = '%s %s Init %d AC %d HP %d' % (s, self.name, self.initiative, self.ac, self.hp)
+        if type(self.notes) == str and self.notes is not '':
+            s = '%s [%s]' % (s, self.notes)
+        return s
 
 class EditUnitDialog(wx.Dialog):
     def __init__(self, *args, **kw):
@@ -117,6 +115,10 @@ class MainFrame(wx.Frame):
 
         innerBox = wx.BoxSizer(wx.HORIZONTAL)
 
+        addBtn = wx.Button(self, 0, "-")
+        addBtn.Bind(wx.EVT_BUTTON, self.removeUnits)
+        innerBox.Add(addBtn, 0, wx.ALIGN_CENTER | wx.EXPAND | wx.ALL, 1)
+
         cycleBtn = wx.Button(self, 0, "Cycle units")
         cycleBtn.Bind(wx.EVT_BUTTON, lambda event: self.cycleUnits())
         innerBox.Add(cycleBtn, 1, wx.ALIGN_CENTER | wx.EXPAND | wx.ALL, 1)
@@ -132,10 +134,12 @@ class MainFrame(wx.Frame):
         self.hasFocus = True
         self.Bind(wx.EVT_CLOSE, self.onClose)
 
+        self.read()
         self.refreshMgmt()
         self.Layout()
 
     def onClose(self, event):
+        self.write()
         event.Skip()
 
     def onListItemActivated(self, event):
@@ -195,6 +199,48 @@ class MainFrame(wx.Frame):
             self.units.append(unit)
         dlg.Destroy()
         self.refreshMgmt()
+
+    def removeUnits(self, event):
+        inds = []
+        names = []
+
+        for i in range(self.mgmt.GetItemCount()):
+            if self.mgmt.IsSelected(i):
+                inds.append(i)
+                names.append(self.units[i].name)
+                self.mgmt.Select(i, False)
+
+        if len(inds) == 0: return
+
+        s = names[0]
+        for name in names[1:]:
+            s = s + '\n' + name
+
+        dlg = wx.MessageDialog(self, s, caption="Remove these units?", style=wx.YES_NO|wx.CENTER)
+        dlg.ShowModal()
+
+        if len(inds) == 0: return
+
+        return
+
+    def read(self):
+        if not os.path.isfile('dmhelper.dat'): return
+
+        self.units = []
+        with open('dmhelper.dat', 'r') as fp:
+            for lines in fp.readlines():
+                unit = Unit()
+                unit.name, unit.pc, unit.initiative, unit.ac, unit.hp, unit.notes = lines.strip().split('\t')
+                unit.pc = bool(unit.pc)
+                unit.initiative = int(unit.initiative)
+                unit.ac = int(unit.ac)
+                unit.hp = int(unit.hp)
+                self.units.append(unit)
+
+    def write(self):
+        with open('dmhelper.dat', 'w') as fp:
+            for unit in self.units:
+                fp.write('%s\t%s\t%d\t%d\t%d\t%s\n' % (unit.name, str(unit.pc), unit.initiative, unit.ac, unit.hp, unit.notes))
 
 app = wx.App()
 frame = MainFrame(None)
