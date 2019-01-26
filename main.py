@@ -181,7 +181,7 @@ class MainFrame(wx.Frame):
         self.refreshMgmt()
 
     def cycleUnits(self):
-        if len(units) == 0: return
+        if len(self.units) == 0: return
 
         unit = self.units[0]
         self.units.remove(self.units[0])
