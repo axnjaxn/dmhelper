@@ -228,7 +228,7 @@ class MainFrame(wx.Frame):
             for lines in fp.readlines():
                 unit = Unit()
                 unit.name, unit.pc, unit.initiative, unit.ac, unit.hp, unit.notes = lines.strip().split('\t')
-                unit.pc = bool(unit.pc)
+                unit.pc = (unit.pc.strip() == 'True')
                 unit.initiative = int(unit.initiative)
                 unit.ac = int(unit.ac)
                 unit.hp = int(unit.hp)
