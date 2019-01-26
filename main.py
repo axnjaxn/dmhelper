@@ -201,27 +201,24 @@ class MainFrame(wx.Frame):
         self.refreshMgmt()
 
     def removeUnits(self, event):
-        inds = []
-        names = []
+        toremove = []
 
         for i in range(self.mgmt.GetItemCount()):
             if self.mgmt.IsSelected(i):
-                inds.append(i)
-                names.append(self.units[i].name)
+                toremove.append(self.units[i])
                 self.mgmt.Select(i, False)
 
-        if len(inds) == 0: return
+        if len(toremove) == 0: return
 
-        s = names[0]
-        for name in names[1:]:
-            s = s + '\n' + name
+        s = toremove[0].name
+        for unit in toremove[1:]:
+            s = s + '\n' + unit.name
 
         dlg = wx.MessageDialog(self, s, caption="Remove these units?", style=wx.YES_NO|wx.CENTER)
-        dlg.ShowModal()
-
-        if len(inds) == 0: return
-
-        return
+        if dlg.ShowModal() == wx.ID_YES:
+            for unit in toremove:
+                self.units.remove(unit)
+            self.refreshMgmt()
 
     def read(self):
         if not os.path.isfile('dmhelper.dat'): return
