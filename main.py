@@ -28,7 +28,8 @@ class EditUnitDialog(wx.Dialog):
         innerBox = wx.BoxSizer(wx.HORIZONTAL)
         innerBox.Add(wx.StaticText(self, 0, "Name"),
                      0, wx.ALIGN_CENTER | wx.EXPAND | wx.ALL, 1)
-        self.nameBox = wx.TextCtrl(self)
+        self.nameBox = wx.TextCtrl(self, style=wx.TE_PROCESS_ENTER)
+        self.nameBox.Bind(wx.EVT_TEXT_ENTER, lambda event: self.OK())
         innerBox.Add(self.nameBox, 1, wx.ALIGN_CENTER | wx.EXPAND | wx.ALL, 1)
         innerBox.Add(wx.StaticText(self, 0, "Is PC"),
                      0, wx.ALIGN_CENTER | wx.EXPAND | wx.ALL, 1)
@@ -40,22 +41,26 @@ class EditUnitDialog(wx.Dialog):
         innerBox = wx.BoxSizer(wx.HORIZONTAL)
         innerBox.Add(wx.StaticText(self, 0, "Init"),
                      0, wx.ALIGN_CENTER | wx.EXPAND | wx.ALL, 1)
-        self.initBox = wx.TextCtrl(self)
+        self.initBox = wx.TextCtrl(self, style=wx.TE_PROCESS_ENTER)
+        self.initBox.Bind(wx.EVT_TEXT_ENTER, lambda event: self.OK())
         innerBox.Add(self.initBox, 0, wx.ALIGN_CENTER | wx.EXPAND | wx.ALL, 1)
         innerBox.Add(wx.StaticText(self, 0, "AC"),
                      0, wx.ALIGN_CENTER | wx.EXPAND | wx.ALL, 1)
-        self.acBox = wx.TextCtrl(self)
+        self.acBox = wx.TextCtrl(self, style=wx.TE_PROCESS_ENTER)
+        self.acBox.Bind(wx.EVT_TEXT_ENTER, lambda event: self.OK())
         innerBox.Add(self.acBox, 0, wx.ALIGN_CENTER | wx.EXPAND | wx.ALL, 1)
         innerBox.Add(wx.StaticText(self, 0, "HP"),
                      0, wx.ALIGN_CENTER | wx.EXPAND | wx.ALL, 1)
-        self.hpBox = wx.TextCtrl(self)
+        self.hpBox = wx.TextCtrl(self, style=wx.TE_PROCESS_ENTER)
+        self.hpBox.Bind(wx.EVT_TEXT_ENTER, lambda event: self.OK())
         innerBox.Add(self.hpBox, 0, wx.ALIGN_CENTER | wx.EXPAND | wx.ALL, 1)
         outerBox.Add(innerBox, 0, wx.ALIGN_CENTER | wx.EXPAND | wx.ALL, 1)
 
         innerBox = wx.BoxSizer(wx.HORIZONTAL)
         innerBox.Add(wx.StaticText(self, 0, "Notes"),
                      0, wx.ALIGN_CENTER | wx.EXPAND | wx.ALL, 1)
-        self.notesBox = wx.TextCtrl(self)
+        self.notesBox = wx.TextCtrl(self, style=wx.TE_PROCESS_ENTER)
+        self.notesBox.Bind(wx.EVT_TEXT_ENTER, lambda event: self.OK())
         innerBox.Add(self.notesBox, 1, wx.ALIGN_CENTER | wx.EXPAND | wx.ALL, 1)
         outerBox.Add(innerBox, 0, wx.ALIGN_CENTER | wx.EXPAND | wx.ALL, 1)
 
