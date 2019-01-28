@@ -1,4 +1,4 @@
-import wx, os, random
+import wx, os, random, webbrowser
 
 class Unit:
     def __init__(self, name = "", pc = True, initiative = 0, ac = 0, hp = 0, notes = ""):
@@ -139,6 +139,8 @@ class MainFrame(wx.Frame):
 
         outerBox.AddSpacer(15)
 
+        middleBox = wx.BoxSizer(wx.HORIZONTAL)
+        
         innerBox = wx.BoxSizer(wx.HORIZONTAL)
         self.rollBox1 = wx.TextCtrl(self, style=wx.TE_PROCESS_ENTER)
         self.rollBox1.Bind(wx.EVT_TEXT_ENTER, lambda event: self.roll(self.rollBox1.GetValue(), self.rollBox2.GetValue()))
@@ -150,7 +152,22 @@ class MainFrame(wx.Frame):
         rollBtn = wx.Button(self, 0, "Roll")
         rollBtn.Bind(wx.EVT_BUTTON, lambda event: self.roll(self.rollBox1.GetValue(), self.rollBox2.GetValue()))
         innerBox.Add(rollBtn, 0, wx.ALIGN_CENTER | wx.EXPAND | wx.ALL, 1)
-        outerBox.Add(innerBox, 0, wx.ALIGN_CENTER | wx.EXPAND | wx.ALL, 1)
+        middleBox.Add(innerBox, 1, wx.ALIGN_CENTER | wx.EXPAND | wx.ALL, 1)
+
+        middleBox.AddSpacer(40)
+
+        innerBox = wx.BoxSizer(wx.HORIZONTAL)
+        innerBox.Add(wx.StaticText(self, 0, "Search"),
+                     0, wx.ALIGN_CENTER | wx.EXPAND | wx.ALL, 1)
+        self.searchBox = wx.TextCtrl(self, style=wx.TE_PROCESS_ENTER)
+        self.searchBox.Bind(wx.EVT_TEXT_ENTER, lambda event: self.search(self.searchBox.GetValue()))
+        innerBox.Add(self.searchBox, 1, wx.ALIGN_CENTER | wx.EXPAND | wx.ALL, 1)
+        searchBtn = wx.Button(self, 0, "Go")
+        searchBtn.Bind(wx.EVT_BUTTON, lambda event: self.search(self.searchBox.GetValue()))
+        innerBox.Add(searchBtn, 0, wx.ALIGN_CENTER | wx.EXPAND | wx.ALL, 1)
+        middleBox.Add(innerBox, 1, wx.ALIGN_CENTER | wx.EXPAND | wx.ALL, 1)
+
+        outerBox.Add(middleBox, 0, wx.ALIGN_CENTER | wx.EXPAND | wx.ALL, 1)
 
         self.SetSizer(outerBox)
 
@@ -266,6 +283,10 @@ class MainFrame(wx.Frame):
             if i > 0: s = s + ', '
             s = s + str(rolls[-1])
         wx.MessageDialog(self, "%s\nTotal: %d" % (s, sum(rolls)), caption="Rolls", style = wx.OK | wx.CENTRE).ShowModal()
+
+    def search(self, queryStr):
+        url = 'https://roll20.net/compendium/dnd5e/searchbook/?terms=%s' % (queryStr)
+        webbrowser.open_new_tab(url)
 
     def read(self):
         if not os.path.isfile('dmhelper.dat'): return
