@@ -17,6 +17,9 @@ class Unit:
             s = '%s [%s]' % (s, self.notes)
         return s
 
+    def clone(self):
+        return Unit(self.name, self.pc, self.initiative, self.ac, self.hp, self.notes)
+
 class EditUnitDialog(wx.Dialog):
     def __init__(self, *args, **kw):
         super(EditUnitDialog, self).__init__(*args, **kw)
@@ -198,11 +201,20 @@ class MainFrame(wx.Frame):
         self.refreshMgmt()
 
     def addUnit(self):
-        dlg = EditUnitDialog(self)
-        if dlg.ShowModal() == wx.ID_OK:
-            unit = dlg.getUnit()
-            self.units.append(unit)
-        dlg.Destroy()
+        copied = False
+        for i in range(self.mgmt.GetItemCount()):
+            if self.mgmt.IsSelected(i):
+                copied = True
+                self.units.append(self.units[i].clone())
+                self.mgmt.Select(i, False)
+
+        if not copied:
+            dlg = EditUnitDialog(self)
+            if dlg.ShowModal() == wx.ID_OK:
+                unit = dlg.getUnit()
+                self.units.append(unit)
+            dlg.Destroy()
+
         self.refreshMgmt()
 
     def removeUnits(self, event):
