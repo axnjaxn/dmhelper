@@ -1,4 +1,4 @@
-import wx, os
+import wx, os, random
 
 class Unit:
     def __init__(self, name = "", pc = True, initiative = 0, ac = 0, hp = 0, notes = ""):
@@ -137,6 +137,21 @@ class MainFrame(wx.Frame):
 
         outerBox.Add(innerBox, 0, wx.ALIGN_CENTER | wx.EXPAND | wx.ALL, 1)
 
+        outerBox.AddSpacer(15)
+
+        innerBox = wx.BoxSizer(wx.HORIZONTAL)
+        self.rollBox1 = wx.TextCtrl(self, style=wx.TE_PROCESS_ENTER)
+        self.rollBox1.Bind(wx.EVT_TEXT_ENTER, lambda event: self.roll(self.rollBox1.GetValue(), self.rollBox2.GetValue()))
+        innerBox.Add(self.rollBox1, 0, wx.ALIGN_CENTER | wx.EXPAND | wx.ALL, 1)
+        innerBox.Add(wx.StaticText(self, 0, "d"), 0, wx.ALIGN_CENTER | wx.EXPAND | wx.ALL, 1)
+        self.rollBox2 = wx.TextCtrl(self, style=wx.TE_PROCESS_ENTER)
+        self.rollBox2.Bind(wx.EVT_TEXT_ENTER, lambda event: self.roll(self.rollBox1.GetValue(), self.rollBox2.GetValue()))
+        innerBox.Add(self.rollBox2, 0, wx.ALIGN_CENTER | wx.EXPAND | wx.ALL, 1)
+        rollBtn = wx.Button(self, 0, "Roll")
+        rollBtn.Bind(wx.EVT_BUTTON, lambda event: self.roll(self.rollBox1.GetValue(), self.rollBox2.GetValue()))
+        innerBox.Add(rollBtn, 0, wx.ALIGN_CENTER | wx.EXPAND | wx.ALL, 1)
+        outerBox.Add(innerBox, 0, wx.ALIGN_CENTER | wx.EXPAND | wx.ALL, 1)
+
         self.SetSizer(outerBox)
 
         self.hasFocus = True
@@ -236,6 +251,21 @@ class MainFrame(wx.Frame):
             for unit in toremove:
                 self.units.remove(unit)
             self.refreshMgmt()
+
+    def roll(self, n, dn):
+        try:
+            n = int(n)
+            dn = int(dn)
+        except:
+            return
+
+        rolls = []
+        s = ''
+        for i in range(n):
+            rolls.append(random.randint(1, dn))
+            if i > 0: s = s + ', '
+            s = s + str(rolls[-1])
+        wx.MessageDialog(self, "%s\nTotal: %d" % (s, sum(rolls)), caption="Rolls", style = wx.OK | wx.CENTRE).ShowModal()
 
     def read(self):
         if not os.path.isfile('dmhelper.dat'): return
