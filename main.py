@@ -295,7 +295,9 @@ class MainFrame(wx.Frame):
         with open('dmhelper.dat', 'r') as fp:
             for lines in fp.readlines():
                 unit = Unit()
-                unit.name, unit.pc, unit.initiative, unit.ac, unit.hp, unit.notes = lines.strip().split('\t')
+                values = lines.strip().split('\t')
+                if len(values) == 5: values.append('')
+                unit.name, unit.pc, unit.initiative, unit.ac, unit.hp, unit.notes = values
                 unit.pc = (unit.pc.strip() == 'True')
                 unit.initiative = int(unit.initiative)
                 unit.ac = int(unit.ac)
