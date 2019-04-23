@@ -127,20 +127,28 @@ class MainFrame(wx.Frame):
         addBtn.Bind(wx.EVT_BUTTON, self.removeUnits)
         innerBox.Add(addBtn, 0, wx.ALIGN_CENTER | wx.EXPAND | wx.ALL, 1)
 
+        addBtn = wx.Button(self, 0, "+")
+        addBtn.Bind(wx.EVT_BUTTON, lambda event: self.addUnit())
+        innerBox.Add(addBtn, 0, wx.ALIGN_CENTER | wx.EXPAND | wx.ALL, 1)
+
         cycleBtn = wx.Button(self, 0, "Cycle units")
         cycleBtn.Bind(wx.EVT_BUTTON, lambda event: self.cycleUnits())
         innerBox.Add(cycleBtn, 1, wx.ALIGN_CENTER | wx.EXPAND | wx.ALL, 1)
 
-        addBtn = wx.Button(self, 0, "+")
-        addBtn.Bind(wx.EVT_BUTTON, lambda event: self.addUnit())
-        innerBox.Add(addBtn, 0, wx.ALIGN_CENTER | wx.EXPAND | wx.ALL, 1)
+        upBtn = wx.Button(self, 0, u"\u2191")
+        upBtn.Bind(wx.EVT_BUTTON, lambda event: self.moveUp())
+        innerBox.Add(upBtn, 0, wx.ALIGN_CENTER | wx.EXPAND | wx.ALL, 1)
+
+        downBtn = wx.Button(self, 0, u"\u2193")
+        downBtn.Bind(wx.EVT_BUTTON, lambda event: self.moveDown())
+        innerBox.Add(downBtn, 0, wx.ALIGN_CENTER | wx.EXPAND | wx.ALL, 1)
 
         outerBox.Add(innerBox, 0, wx.ALIGN_CENTER | wx.EXPAND | wx.ALL, 1)
 
         outerBox.AddSpacer(15)
 
         middleBox = wx.BoxSizer(wx.HORIZONTAL)
-        
+
         innerBox = wx.BoxSizer(wx.HORIZONTAL)
         self.rollBox1 = wx.TextCtrl(self, style=wx.TE_PROCESS_ENTER)
         self.rollBox1.Bind(wx.EVT_TEXT_ENTER, lambda event: self.roll(self.rollBox1.GetValue(), self.rollBox2.GetValue()))
@@ -231,6 +239,30 @@ class MainFrame(wx.Frame):
         self.units.remove(self.units[0])
         self.units.append(unit)
         self.refreshMgmt()
+
+    def moveUp(self):
+        ct = 0
+        for i in range(self.mgmt.GetItemCount()):
+            if self.mgmt.IsSelected(i):
+                idx = i
+                ct = ct + 1
+                self.mgmt.Select(i, False)
+        if ct == 1 and idx > 0:
+            self.units[idx], self.units[idx - 1] = self.units[idx - 1], self.units[idx]
+            self.refreshMgmt()
+            self.mgmt.Select(idx - 1, True)
+
+    def moveDown(self):
+        ct = 0
+        for i in range(self.mgmt.GetItemCount()):
+            if self.mgmt.IsSelected(i):
+                idx = i
+                ct = ct + 1
+                self.mgmt.Select(i, False)
+        if ct == 1 and idx < len(self.units) - 1:
+            self.units[idx], self.units[idx + 1] = self.units[idx + 1], self.units[idx]
+            self.refreshMgmt()
+            self.mgmt.Select(idx + 1, True)
 
     def addUnit(self):
         copied = False
