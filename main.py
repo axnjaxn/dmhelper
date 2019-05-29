@@ -1,24 +1,4 @@
-import wx, os, random, webbrowser
-
-class Unit:
-    def __init__(self, name = "", pc = True, initiative = 0, ac = 0, hp = 0, notes = ""):
-        self.name = name
-        self.pc = pc
-        self.initiative = initiative
-        self.ac = ac
-        self.hp = hp
-        self.notes = notes
-
-    def __str__(self):
-        if self.pc: s = 'PC'
-        else: s = 'NPC'
-        s = '%s %s Init %d AC %d HP %d' % (s, self.name, self.initiative, self.ac, self.hp)
-        if type(self.notes) == str and self.notes is not '':
-            s = '%s [%s]' % (s, self.notes)
-        return s
-
-    def clone(self):
-        return Unit(self.name, self.pc, self.initiative, self.ac, self.hp, self.notes)
+import wx, os, random, webbrowser, json
 
 class EditUnitDialog(wx.Dialog):
     def __init__(self, *args, **kw):
@@ -77,12 +57,12 @@ class EditUnitDialog(wx.Dialog):
         self.Layout()
 
     def setUnit(self, unit):
-        self.nameBox.SetValue(unit.name)
-        self.pcBox.SetValue(unit.pc)
-        self.initBox.SetValue(str(unit.initiative))
-        self.acBox.SetValue(str(unit.ac))
-        self.hpBox.SetValue(str(unit.hp))
-        self.notesBox.SetValue(unit.notes)
+        self.nameBox.SetValue(unit['name'])
+        self.pcBox.SetValue(unit['pc'])
+        self.initBox.SetValue(str(unit['initiative']))
+        self.acBox.SetValue(str(unit['ac']))
+        self.hpBox.SetValue(str(unit['hp']))
+        self.notesBox.SetValue(unit['notes'])
 
     def isValid(self):
         try:
@@ -97,12 +77,14 @@ class EditUnitDialog(wx.Dialog):
         if self.isValid(): self.EndModal(wx.ID_OK)
 
     def getUnit(self):
-        unit = Unit(self.nameBox.GetValue(), self.pcBox.GetValue(),
-                    int(self.initBox.GetValue()),
-                    int(self.acBox.GetValue()),
-                    int(self.hpBox.GetValue()),
-                    self.notesBox.GetValue())
-        return unit
+        return {
+            'name': self.nameBox.GetValue(),
+            'pc': self.pcBox.GetValue(),
+            'initiative': int(self.initBox.GetValue()),
+            'ac': int(self.acBox.GetValue()),
+            'hp': int(self.hpBox.GetValue()),
+            'notes': self.notesBox.GetValue()
+        }
 
     def OnClose(self, e):
         self.Destroy()
@@ -212,8 +194,8 @@ class MainFrame(wx.Frame):
 
         for i in range(len(self.units)):
             unit = self.units[i]
-            self.mgmt.Append([unit.name, unit.initiative, unit.ac, unit.hp, unit.notes])
-            if not unit.pc:
+            self.mgmt.Append([unit['name'], unit['initiative'], unit['ac'], unit['hp'], unit['notes']])
+            if not unit['pc']:
                 self.mgmt.SetItemTextColour(i, wx.Colour(255, 0, 0))
 
         self.mgmt.SetColumnWidth(0, wx.LIST_AUTOSIZE_USEHEADER)
@@ -225,11 +207,11 @@ class MainFrame(wx.Frame):
         self.mgmt.Bind(wx.EVT_LIST_COL_CLICK, self.colClicked)
 
     def colClicked(self, event):
-        if event.GetColumn() == 0: self.units.sort(key = lambda entry: entry.name)
-        elif event.GetColumn() == 1: self.units.sort(key = lambda entry: entry.initiative, reverse = True)
-        elif event.GetColumn() == 2: self.units.sort(key = lambda entry: entry.ac, reverse = True)
-        elif event.GetColumn() == 3: self.units.sort(key = lambda entry: entry.hp, reverse = True)
-        elif event.GetColumn() == 4: self.units.sort(key = lambda entry: entry.notes)
+        if event.GetColumn() == 0: self.units.sort(key = lambda entry: entry['name'])
+        elif event.GetColumn() == 1: self.units.sort(key = lambda entry: entry['initiative'], reverse = True)
+        elif event.GetColumn() == 2: self.units.sort(key = lambda entry: entry['ac'], reverse = True)
+        elif event.GetColumn() == 3: self.units.sort(key = lambda entry: entry['hp'], reverse = True)
+        elif event.GetColumn() == 4: self.units.sort(key = lambda entry: entry['notes'])
         self.refreshMgmt()
 
     def cycleUnits(self):
@@ -293,7 +275,7 @@ class MainFrame(wx.Frame):
 
         s = toremove[0].name
         for unit in toremove[1:]:
-            s = s + '\n' + unit.name
+            s = s + '\n' + unit['name']
 
         dlg = wx.MessageDialog(self, s, caption="Remove these units?", style=wx.YES_NO|wx.CENTER)
         if dlg.ShowModal() == wx.ID_YES:
@@ -320,26 +302,9 @@ class MainFrame(wx.Frame):
         url = 'https://roll20.net/compendium/dnd5e/searchbook/?terms=%s' % (queryStr)
         webbrowser.open_new_tab(url)
 
-    def read(self):
-        if not os.path.isfile('dmhelper.dat'): return
+    def read(self): self.units = json.load(open('dmhelper.json', 'r'))
 
-        self.units = []
-        with open('dmhelper.dat', 'r') as fp:
-            for lines in fp.readlines():
-                unit = Unit()
-                values = lines.strip().split('\t')
-                if len(values) == 5: values.append('')
-                unit.name, unit.pc, unit.initiative, unit.ac, unit.hp, unit.notes = values
-                unit.pc = (unit.pc.strip() == 'True')
-                unit.initiative = int(unit.initiative)
-                unit.ac = int(unit.ac)
-                unit.hp = int(unit.hp)
-                self.units.append(unit)
-
-    def write(self):
-        with open('dmhelper.dat', 'w') as fp:
-            for unit in self.units:
-                fp.write('%s\t%s\t%d\t%d\t%d\t%s\n' % (unit.name, str(unit.pc), unit.initiative, unit.ac, unit.hp, unit.notes))
+    def write(self): json.dump(self.units, open('dmhelper.json', 'w'), indent=4)
 
 app = wx.App()
 frame = MainFrame(None)
