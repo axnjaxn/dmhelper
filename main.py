@@ -277,7 +277,7 @@ class MainFrame(wx.Frame):
 
         if len(toremove) == 0: return
 
-        s = toremove[0].name
+        s = toremove[0]['name']
         for unit in toremove[1:]:
             s = s + '\n' + unit['name']
 
