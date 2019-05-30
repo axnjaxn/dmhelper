@@ -1,4 +1,4 @@
-import wx, os, random, webbrowser, json
+import wx, os, random, webbrowser, json, copy
 
 class EditUnitDialog(wx.Dialog):
     def __init__(self, *args, **kw):
@@ -59,14 +59,14 @@ class EditUnitDialog(wx.Dialog):
     def setUnit(self, unit):
         self.nameBox.SetValue(unit['name'])
         self.pcBox.SetValue(unit['pc'])
-        self.initBox.SetValue(str(unit['initiative']))
+        self.initBox.SetValue(str(unit['initiative'] or ''))
         self.acBox.SetValue(str(unit['ac']))
         self.hpBox.SetValue(str(unit['hp']))
         self.notesBox.SetValue(unit['notes'])
 
     def isValid(self):
         try:
-            int(self.initBox.GetValue())
+            if len(self.initBox.GetValue()) > 0: int(self.initBox.GetValue())
             int(self.acBox.GetValue())
             int(self.hpBox.GetValue())
         except ValueError as e:
@@ -77,14 +77,18 @@ class EditUnitDialog(wx.Dialog):
         if self.isValid(): self.EndModal(wx.ID_OK)
 
     def getUnit(self):
-        return {
+        unit =  {
             'name': self.nameBox.GetValue(),
             'pc': self.pcBox.GetValue(),
-            'initiative': int(self.initBox.GetValue()),
+            'initiative': None,
             'ac': int(self.acBox.GetValue()),
             'hp': int(self.hpBox.GetValue()),
             'notes': self.notesBox.GetValue()
         }
+        if len(self.initBox.GetValue()) > 0:
+            unit['initiative'] = int(self.initBox.GetValue())
+        return unit
+
 
     def OnClose(self, e):
         self.Destroy()
@@ -194,7 +198,7 @@ class MainFrame(wx.Frame):
 
         for i in range(len(self.units)):
             unit = self.units[i]
-            self.mgmt.Append([unit['name'], unit['initiative'], unit['ac'], unit['hp'], unit['notes']])
+            self.mgmt.Append([unit['name'], unit['initiative'] or '', unit['ac'], unit['hp'], unit['notes']])
             if not unit['pc']:
                 self.mgmt.SetItemTextColour(i, wx.Colour(255, 0, 0))
 
@@ -251,7 +255,7 @@ class MainFrame(wx.Frame):
         for i in range(self.mgmt.GetItemCount()):
             if self.mgmt.IsSelected(i):
                 copied = True
-                self.units.append(self.units[i].clone())
+                self.units.append(copy.deepcopy(self.units[i]))
                 self.mgmt.Select(i, False)
 
         if not copied:
