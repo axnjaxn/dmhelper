@@ -22,6 +22,11 @@ class EditUnitDialog(wx.Dialog):
         outerBox.Add(innerBox, 0, wx.ALIGN_CENTER | wx.EXPAND | wx.ALL, 1)
 
         innerBox = wx.BoxSizer(wx.HORIZONTAL)
+        innerBox.Add(wx.StaticText(self, 0, "Dex"),
+                     0, wx.ALIGN_CENTER | wx.EXPAND | wx.ALL, 1)
+        self.dexBox = wx.TextCtrl(self, style=wx.TE_PROCESS_ENTER)
+        self.dexBox.Bind(wx.EVT_TEXT_ENTER, lambda event: self.OK())
+        innerBox.Add(self.dexBox, 0, wx.ALIGN_CENTER | wx.EXPAND | wx.ALL, 1)
         innerBox.Add(wx.StaticText(self, 0, "Init"),
                      0, wx.ALIGN_CENTER | wx.EXPAND | wx.ALL, 1)
         self.initBox = wx.TextCtrl(self, style=wx.TE_PROCESS_ENTER)
@@ -59,6 +64,7 @@ class EditUnitDialog(wx.Dialog):
     def setUnit(self, unit):
         self.nameBox.SetValue(unit['name'])
         self.pcBox.SetValue(unit['pc'])
+        self.dexBox.SetValue(str(unit['dex']))
         self.initBox.SetValue(str(unit['initiative'] or ''))
         self.acBox.SetValue(str(unit['ac']))
         self.hpBox.SetValue(str(unit['hp']))
@@ -66,6 +72,7 @@ class EditUnitDialog(wx.Dialog):
 
     def isValid(self):
         try:
+            int(self.dexBox.GetValue())
             if len(self.initBox.GetValue()) > 0: int(self.initBox.GetValue())
             int(self.acBox.GetValue())
             int(self.hpBox.GetValue())
@@ -80,6 +87,7 @@ class EditUnitDialog(wx.Dialog):
         unit =  {
             'name': self.nameBox.GetValue(),
             'pc': self.pcBox.GetValue(),
+            'dex': int(self.dexBox.GetValue()),
             'initiative': None,
             'ac': int(self.acBox.GetValue()),
             'hp': int(self.hpBox.GetValue()),
@@ -136,6 +144,18 @@ class MainFrame(wx.Frame):
         middleBox = wx.BoxSizer(wx.HORIZONTAL)
 
         innerBox = wx.BoxSizer(wx.HORIZONTAL)
+        rollBtn = wx.Button(self, 0, "Roll Initiative")
+        rollBtn.Bind(wx.EVT_BUTTON, lambda event: self.rollInitiative())
+        innerBox.Add(rollBtn, 0, wx.ALIGN_CENTER | wx.EXPAND | wx.ALL, 1)
+        middleBox.Add(innerBox, 1, wx.ALIGN_CENTER | wx.EXPAND | wx.ALL, 1)
+
+        outerBox.Add(middleBox, 0, wx.ALIGN_CENTER | wx.EXPAND | wx.ALL, 1)
+
+        outerBox.AddSpacer(15)
+
+        middleBox = wx.BoxSizer(wx.HORIZONTAL)
+
+        innerBox = wx.BoxSizer(wx.HORIZONTAL)
         self.rollBox1 = wx.TextCtrl(self, style=wx.TE_PROCESS_ENTER)
         self.rollBox1.Bind(wx.EVT_TEXT_ENTER, lambda event: self.roll(self.rollBox1.GetValue(), self.rollBox2.GetValue()))
         innerBox.Add(self.rollBox1, 0, wx.ALIGN_CENTER | wx.EXPAND | wx.ALL, 1)
@@ -186,6 +206,14 @@ class MainFrame(wx.Frame):
             self.units[ind] = dlg.getUnit()
         dlg.Destroy()
         self.refreshMgmt()
+
+    def selectedUnits(self):
+        selected = []
+        for i in range(self.mgmt.GetItemCount()):
+            if self.mgmt.IsSelected(i):
+                selected.append(i)
+                self.mgmt.Select(i, False)
+        return selected
 
     def refreshMgmt(self):
         self.mgmt.ClearAll()
@@ -286,6 +314,12 @@ class MainFrame(wx.Frame):
             for unit in toremove:
                 self.units.remove(unit)
             self.refreshMgmt()
+
+    def rollInitiative(self):
+        selected = self.selectedUnits()
+        for idx in selected:
+            self.units[idx]['initiative'] = random.randint(1, 20) + self.units[idx]['dex']
+        self.refreshMgmt()
 
     def roll(self, n, dn):
         try:
