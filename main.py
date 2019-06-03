@@ -147,6 +147,9 @@ class MainFrame(wx.Frame):
         rollBtn = wx.Button(self, 0, "Roll Initiative")
         rollBtn.Bind(wx.EVT_BUTTON, lambda event: self.rollInitiative())
         innerBox.Add(rollBtn, 0, wx.ALIGN_CENTER | wx.EXPAND | wx.ALL, 1)
+        reletterBtn = wx.Button(self, 0, "Reletter Units")
+        reletterBtn.Bind(wx.EVT_BUTTON, lambda event: self.reletter())
+        innerBox.Add(reletterBtn, 0, wx.ALIGN_CENTER | wx.EXPAND | wx.ALL, 1)
         middleBox.Add(innerBox, 1, wx.ALIGN_CENTER | wx.EXPAND | wx.ALL, 1)
 
         outerBox.Add(middleBox, 0, wx.ALIGN_CENTER | wx.EXPAND | wx.ALL, 1)
@@ -319,6 +322,34 @@ class MainFrame(wx.Frame):
         selected = self.selectedUnits()
         for idx in selected:
             self.units[idx]['initiative'] = random.randint(1, 20) + self.units[idx]['dex']
+        self.refreshMgmt()
+
+    def _getLettering(self, name):
+        s = name.strip().split(' ')
+        if len(s) > 1 and len(s[-1]) == 1:
+            c = ord(s[-1])
+            if c >= ord('A') and c <= ord('Z'): return s[-1]
+
+    def _stripLetter(self, name):
+        if self._getLettering(name) is None: return name
+        return name[:-2].strip()
+
+    def reletter(self):
+        selected = self.selectedUnits()
+        for idx in selected:
+            self.units[idx]['name'] = self._stripLetter(self.units[idx]['name'])
+
+        firstLetter = ord('A') - 1
+        for unit in self.units:
+            letter = self._getLettering(unit['name'])
+            if letter is not None: firstLetter = max(ord(letter), firstLetter)
+        firstLetter = firstLetter + 1
+
+        for idx in selected:
+            if self._getLettering(self.units[idx]['name']) is None and firstLetter <= ord('Z'):
+                self.units[idx]['name'] = self.units[idx]['name'].strip() + ' ' + chr(firstLetter)
+                firstLetter = firstLetter + 1
+
         self.refreshMgmt()
 
     def roll(self, n, dn):
