@@ -258,38 +258,29 @@ class MainFrame(wx.Frame):
         self.refreshMgmt()
 
     def moveUp(self):
-        ct = 0
-        for i in range(self.mgmt.GetItemCount()):
-            if self.mgmt.IsSelected(i):
-                idx = i
-                ct = ct + 1
-                self.mgmt.Select(i, False)
-        if ct == 1 and idx > 0:
+        selected = self.selectedUnits()
+        if len(selected) != 1: return
+        idx = selected[0]
+        if idx > 0:
             self.units[idx], self.units[idx - 1] = self.units[idx - 1], self.units[idx]
             self.refreshMgmt()
             self.mgmt.Select(idx - 1, True)
 
     def moveDown(self):
-        ct = 0
-        for i in range(self.mgmt.GetItemCount()):
-            if self.mgmt.IsSelected(i):
-                idx = i
-                ct = ct + 1
-                self.mgmt.Select(i, False)
-        if ct == 1 and idx < len(self.units) - 1:
+        selected = self.selectedUnits()
+        if len(selected) != 1: return
+        idx = selected[0]
+        if idx < len(self.units) - 1:
             self.units[idx], self.units[idx + 1] = self.units[idx + 1], self.units[idx]
             self.refreshMgmt()
             self.mgmt.Select(idx + 1, True)
 
     def addUnit(self):
-        copied = False
-        for i in range(self.mgmt.GetItemCount()):
-            if self.mgmt.IsSelected(i):
-                copied = True
-                self.units.append(copy.deepcopy(self.units[i]))
-                self.mgmt.Select(i, False)
+        selected = self.selectedUnits()
+        for i in selected:
+            self.units.append(copy.deepcopy(self.units[i]))
 
-        if not copied:
+        if len(selected) == 0:
             dlg = EditUnitDialog(self)
             if dlg.ShowModal() == wx.ID_OK:
                 unit = dlg.getUnit()
@@ -299,14 +290,11 @@ class MainFrame(wx.Frame):
         self.refreshMgmt()
 
     def removeUnits(self, event):
+        selected = self.selectedUnits()
+        if len(selected) == 0: return
+
         toremove = []
-
-        for i in range(self.mgmt.GetItemCount()):
-            if self.mgmt.IsSelected(i):
-                toremove.append(self.units[i])
-                self.mgmt.Select(i, False)
-
-        if len(toremove) == 0: return
+        for i in selected: toremove.append(self.units[i])
 
         s = toremove[0]['name']
         for unit in toremove[1:]:
