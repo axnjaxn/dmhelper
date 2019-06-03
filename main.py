@@ -152,6 +152,17 @@ class MainFrame(wx.Frame):
         innerBox.Add(reletterBtn, 0, wx.ALIGN_CENTER | wx.EXPAND | wx.ALL, 1)
         middleBox.Add(innerBox, 1, wx.ALIGN_CENTER | wx.EXPAND | wx.ALL, 1)
 
+        middleBox.AddSpacer(40)
+
+        innerBox = wx.BoxSizer(wx.HORIZONTAL)
+        self.dmgBox = wx.TextCtrl(self, style=wx.TE_PROCESS_ENTER)
+        self.dmgBox.Bind(wx.EVT_TEXT_ENTER, lambda event: self.doDamage(self.dmgBox.GetValue()))
+        innerBox.Add(self.dmgBox, 0, wx.ALIGN_CENTER | wx.EXPAND | wx.ALL, 1)
+        rollBtn = wx.Button(self, 0, "Do damage")
+        rollBtn.Bind(wx.EVT_BUTTON, lambda event: self.doDamage(self.dmgBox.GetValue()))
+        innerBox.Add(rollBtn, 0, wx.ALIGN_CENTER | wx.EXPAND | wx.ALL, 1)
+        middleBox.Add(innerBox, 0, wx.ALIGN_CENTER | wx.EXPAND | wx.ALL, 1)
+
         outerBox.Add(middleBox, 0, wx.ALIGN_CENTER | wx.EXPAND | wx.ALL, 1)
 
         outerBox.AddSpacer(15)
@@ -338,6 +349,17 @@ class MainFrame(wx.Frame):
                 self.units[idx]['name'] = self.units[idx]['name'].strip() + ' ' + chr(firstLetter)
                 firstLetter = firstLetter + 1
 
+        self.refreshMgmt()
+
+    def doDamage(self, pts):
+        try:
+            pts = int(pts)
+        except ValueError as e:
+            return
+
+        selected = self.selectedUnits()
+        for idx in selected:
+            self.units[idx]['hp'] = max(self.units[idx]['hp'] - pts, 0)
         self.refreshMgmt()
 
     def roll(self, n, dn):
