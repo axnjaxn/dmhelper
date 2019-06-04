@@ -20,6 +20,13 @@ class EditUnitDialog(wx.Dialog):
         self.notesBox = wx.TextCtrl(self, style=wx.TE_PROCESS_ENTER)
         self.notesBox.Bind(wx.EVT_TEXT_ENTER, lambda event: self.OK())
 
+        idClose = wx.NewId()
+        self.Bind(wx.EVT_MENU, lambda event: self.Close(), id=idClose)
+        accel_tbl = wx.AcceleratorTable([
+            (wx.ACCEL_NORMAL, wx.WXK_ESCAPE , idClose)
+        ])
+        self.SetAcceleratorTable(accel_tbl)
+
         self.rebuild()
 
     def rebuild(self):
@@ -30,7 +37,15 @@ class EditUnitDialog(wx.Dialog):
         if self.image is not None:
             if not self.bmp.LoadFile(self.image): raise Exception()
             self.imageFrame = wx.StaticBitmap(self, 0, self.bmp)
-            outerBox.Add(self.imageFrame, 0, wx.ALIGN_CENTER | wx.EXPAND | wx.ALL, 1)
+            innerBox = wx.BoxSizer(wx.HORIZONTAL)
+            panel = wx.Panel(self)
+            panel.SetBackgroundColour(self.GetBackgroundColour())
+            innerBox.Add(panel, 1, wx.ALIGN_CENTER | wx.EXPAND | wx.ALL, 0)
+            innerBox.Add(self.imageFrame, 0, wx.ALIGN_CENTER | wx.EXPAND | wx.ALL, 0)
+            panel = wx.Panel(self)
+            panel.SetBackgroundColour(self.GetBackgroundColour())
+            innerBox.Add(panel, 1, wx.ALIGN_CENTER | wx.EXPAND | wx.ALL, 0)
+            outerBox.Add(innerBox, 1, wx.ALIGN_CENTER | wx.EXPAND | wx.ALL, 1)
             removeBtn = wx.Button(self, 0, "Remove Image")
             removeBtn.Bind(wx.EVT_BUTTON, lambda event: self.removeImage())
             outerBox.Add(removeBtn,
@@ -250,6 +265,20 @@ class MainFrame(wx.Frame):
         self.hasFocus = True
         self.Bind(wx.EVT_CLOSE, self.onClose)
 
+        idClose = wx.NewId()
+        idPreview = wx.NewId()
+        idCycle = wx.NewId()
+        self.Bind(wx.EVT_MENU, lambda event: self.Close(), id=idClose)
+        self.Bind(wx.EVT_MENU, lambda event: self.openPreview(), id=idPreview)
+        self.Bind(wx.EVT_MENU, lambda event: self.cycleUnits(), id=idCycle)
+        accel_tbl = wx.AcceleratorTable([
+            (wx.ACCEL_CTRL,  ord('Q'), idClose),
+            (wx.ACCEL_CTRL,  ord('W'), idClose),
+            (wx.ACCEL_NORMAL, ord(' '), idPreview),
+            (wx.ACCEL_NORMAL, wx.WXK_RETURN, idCycle)
+        ])
+        self.SetAcceleratorTable(accel_tbl)
+
         self.read()
         self.refreshMgmt()
         self.Layout()
@@ -266,6 +295,16 @@ class MainFrame(wx.Frame):
         dlg.setUnit(unit)
         if dlg.ShowModal() == wx.ID_OK:
             self.units[ind] = dlg.getUnit()
+        dlg.Destroy()
+        self.refreshMgmt()
+
+    def openPreview(self):
+        if len(self.units) == 0: return
+
+        dlg = EditUnitDialog(self)
+        dlg.setUnit(self.units[0])
+        if dlg.ShowModal() == wx.ID_OK:
+            self.units[0] = dlg.getUnit()
         dlg.Destroy()
         self.refreshMgmt()
 
