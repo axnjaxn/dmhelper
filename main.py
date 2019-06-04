@@ -1,54 +1,73 @@
-import wx, os, random, webbrowser, json, copy
+import wx, os, random, webbrowser, json, copy, uuid
 
 class EditUnitDialog(wx.Dialog):
     def __init__(self, *args, **kw):
         super(EditUnitDialog, self).__init__(*args, **kw)
 
+        self.bmp = wx.Bitmap()
+        self.image = None
+        self.nameBox = wx.TextCtrl(self, style=wx.TE_PROCESS_ENTER)
+        self.nameBox.Bind(wx.EVT_TEXT_ENTER, lambda event: self.OK())
+        self.pcBox = wx.CheckBox(self)
+        self.dexBox = wx.TextCtrl(self, style=wx.TE_PROCESS_ENTER)
+        self.dexBox.Bind(wx.EVT_TEXT_ENTER, lambda event: self.OK())
+        self.initBox = wx.TextCtrl(self, style=wx.TE_PROCESS_ENTER)
+        self.initBox.Bind(wx.EVT_TEXT_ENTER, lambda event: self.OK())
+        self.acBox = wx.TextCtrl(self, style=wx.TE_PROCESS_ENTER)
+        self.acBox.Bind(wx.EVT_TEXT_ENTER, lambda event: self.OK())
+        self.hpBox = wx.TextCtrl(self, style=wx.TE_PROCESS_ENTER)
+        self.hpBox.Bind(wx.EVT_TEXT_ENTER, lambda event: self.OK())
+        self.notesBox = wx.TextCtrl(self, style=wx.TE_PROCESS_ENTER)
+        self.notesBox.Bind(wx.EVT_TEXT_ENTER, lambda event: self.OK())
+
+        self.rebuild()
+
+    def rebuild(self):
         self.SetTitle("Edit Unit")
 
         outerBox = wx.BoxSizer(wx.VERTICAL)
 
+        if self.image is not None:
+            if not self.bmp.LoadFile(self.image): raise Exception()
+            self.imageFrame = wx.StaticBitmap(self, 0, self.bmp)
+            outerBox.Add(self.imageFrame, 0, wx.ALIGN_CENTER | wx.EXPAND | wx.ALL, 1)
+            removeBtn = wx.Button(self, 0, "Remove Image")
+            removeBtn.Bind(wx.EVT_BUTTON, lambda event: self.removeImage())
+            outerBox.Add(removeBtn,
+                         0, wx.ALIGN_CENTER | wx.EXPAND | wx.ALL, 1)
+        else:
+            addBtn = wx.Button(self, 0, "Paste Image")
+            addBtn.Bind(wx.EVT_BUTTON, lambda event: self.pasteImage())
+            outerBox.Add(addBtn,
+                         0, wx.ALIGN_CENTER | wx.EXPAND | wx.ALL, 1)
+
         innerBox = wx.BoxSizer(wx.HORIZONTAL)
         innerBox.Add(wx.StaticText(self, 0, "Name"),
                      0, wx.ALIGN_CENTER | wx.EXPAND | wx.ALL, 1)
-        self.nameBox = wx.TextCtrl(self, style=wx.TE_PROCESS_ENTER)
-        self.nameBox.Bind(wx.EVT_TEXT_ENTER, lambda event: self.OK())
         innerBox.Add(self.nameBox, 1, wx.ALIGN_CENTER | wx.EXPAND | wx.ALL, 1)
         innerBox.Add(wx.StaticText(self, 0, "Is PC"),
                      0, wx.ALIGN_CENTER | wx.EXPAND | wx.ALL, 1)
-        self.pcBox = wx.CheckBox(self)
         innerBox.Add(self.pcBox, 0, wx.ALIGN_CENTER | wx.EXPAND | wx.ALL, 1)
-
         outerBox.Add(innerBox, 0, wx.ALIGN_CENTER | wx.EXPAND | wx.ALL, 1)
 
         innerBox = wx.BoxSizer(wx.HORIZONTAL)
         innerBox.Add(wx.StaticText(self, 0, "Dex"),
                      0, wx.ALIGN_CENTER | wx.EXPAND | wx.ALL, 1)
-        self.dexBox = wx.TextCtrl(self, style=wx.TE_PROCESS_ENTER)
-        self.dexBox.Bind(wx.EVT_TEXT_ENTER, lambda event: self.OK())
         innerBox.Add(self.dexBox, 0, wx.ALIGN_CENTER | wx.EXPAND | wx.ALL, 1)
         innerBox.Add(wx.StaticText(self, 0, "Init"),
                      0, wx.ALIGN_CENTER | wx.EXPAND | wx.ALL, 1)
-        self.initBox = wx.TextCtrl(self, style=wx.TE_PROCESS_ENTER)
-        self.initBox.Bind(wx.EVT_TEXT_ENTER, lambda event: self.OK())
         innerBox.Add(self.initBox, 0, wx.ALIGN_CENTER | wx.EXPAND | wx.ALL, 1)
         innerBox.Add(wx.StaticText(self, 0, "AC"),
                      0, wx.ALIGN_CENTER | wx.EXPAND | wx.ALL, 1)
-        self.acBox = wx.TextCtrl(self, style=wx.TE_PROCESS_ENTER)
-        self.acBox.Bind(wx.EVT_TEXT_ENTER, lambda event: self.OK())
         innerBox.Add(self.acBox, 0, wx.ALIGN_CENTER | wx.EXPAND | wx.ALL, 1)
         innerBox.Add(wx.StaticText(self, 0, "HP"),
                      0, wx.ALIGN_CENTER | wx.EXPAND | wx.ALL, 1)
-        self.hpBox = wx.TextCtrl(self, style=wx.TE_PROCESS_ENTER)
-        self.hpBox.Bind(wx.EVT_TEXT_ENTER, lambda event: self.OK())
         innerBox.Add(self.hpBox, 0, wx.ALIGN_CENTER | wx.EXPAND | wx.ALL, 1)
         outerBox.Add(innerBox, 0, wx.ALIGN_CENTER | wx.EXPAND | wx.ALL, 1)
 
         innerBox = wx.BoxSizer(wx.HORIZONTAL)
         innerBox.Add(wx.StaticText(self, 0, "Notes"),
                      0, wx.ALIGN_CENTER | wx.EXPAND | wx.ALL, 1)
-        self.notesBox = wx.TextCtrl(self, style=wx.TE_PROCESS_ENTER)
-        self.notesBox.Bind(wx.EVT_TEXT_ENTER, lambda event: self.OK())
         innerBox.Add(self.notesBox, 1, wx.ALIGN_CENTER | wx.EXPAND | wx.ALL, 1)
         outerBox.Add(innerBox, 0, wx.ALIGN_CENTER | wx.EXPAND | wx.ALL, 1)
 
@@ -61,7 +80,33 @@ class EditUnitDialog(wx.Dialog):
 
         self.Layout()
 
+    def pasteImage(self):
+        cb = wx.Clipboard().Get()
+        if cb.Open():
+            if cb.IsSupported(wx.DataFormat(format=wx.DF_BITMAP)):
+                data = wx.BitmapDataObject()
+                cb.GetData(data)
+                bmp = data.GetBitmap()
+                fn = '%s.png' % (uuid.uuid1().hex)
+                if bmp.SaveFile(fn, wx.BITMAP_TYPE_PNG):
+                    self.image = fn
+                    self.bmp = bmp
+                    self.rebuild()
+            cb.Close()
+
+    def removeImage(self):
+        self.image = None
+        self.bmp = None
+        self.imageFrame.Hide()
+        self.rebuild()
+
     def setUnit(self, unit):
+        if 'image' in unit:
+            self.image = unit['image']
+            self.bmp.LoadFile(self.image)
+        else:
+            self.image = None
+            self.bmp = None
         self.nameBox.SetValue(unit['name'])
         self.pcBox.SetValue(unit['pc'])
         self.dexBox.SetValue(str(unit['dex']))
@@ -69,6 +114,7 @@ class EditUnitDialog(wx.Dialog):
         self.acBox.SetValue(str(unit['ac']))
         self.hpBox.SetValue(str(unit['hp']))
         self.notesBox.SetValue(unit['notes'])
+        self.rebuild()
 
     def isValid(self):
         try:
@@ -95,6 +141,8 @@ class EditUnitDialog(wx.Dialog):
         }
         if len(self.initBox.GetValue()) > 0:
             unit['initiative'] = int(self.initBox.GetValue())
+        if self.image is not None:
+            unit['image'] = self.image
         return unit
 
 
