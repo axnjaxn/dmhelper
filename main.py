@@ -319,15 +319,20 @@ class MainFrame(wx.Frame):
     def refreshMgmt(self):
         self.mgmt.ClearAll()
 
-        self.mgmt.InsertColumn(0, "Name")
-        self.mgmt.InsertColumn(1, "Init")
-        self.mgmt.InsertColumn(2, "AC")
-        self.mgmt.InsertColumn(3, "HP")
-        self.mgmt.InsertColumn(4, "Notes")
+        self.mgmt.InsertColumn(0, "")
+        self.mgmt.InsertColumn(1, "Name")
+        self.mgmt.InsertColumn(2, "Init")
+        self.mgmt.InsertColumn(3, "AC")
+        self.mgmt.InsertColumn(4, "HP")
+        self.mgmt.InsertColumn(5, "Notes")
 
         for i in range(len(self.units)):
             unit = self.units[i]
-            self.mgmt.Append([unit['name'], unit['initiative'] or '', unit['ac'], unit['hp'], unit['notes']])
+
+            if 'image' in unit: s = u'\u25A0'
+            else: s = ' '
+
+            self.mgmt.Append([s, unit['name'], unit['initiative'] or '', unit['ac'], unit['hp'], unit['notes']])
             if not unit['pc']:
                 self.mgmt.SetItemTextColour(i, wx.Colour(255, 0, 0))
 
@@ -336,15 +341,16 @@ class MainFrame(wx.Frame):
         self.mgmt.SetColumnWidth(2, wx.LIST_AUTOSIZE_USEHEADER)
         self.mgmt.SetColumnWidth(3, wx.LIST_AUTOSIZE_USEHEADER)
         self.mgmt.SetColumnWidth(4, wx.LIST_AUTOSIZE_USEHEADER)
+        self.mgmt.SetColumnWidth(4, wx.LIST_AUTOSIZE_USEHEADER)
 
         self.mgmt.Bind(wx.EVT_LIST_COL_CLICK, self.colClicked)
 
     def colClicked(self, event):
-        if event.GetColumn() == 0: self.units.sort(key = lambda entry: entry['name'])
-        elif event.GetColumn() == 1: self.units.sort(key = lambda entry: entry['initiative'], reverse = True)
-        elif event.GetColumn() == 2: self.units.sort(key = lambda entry: entry['ac'], reverse = True)
-        elif event.GetColumn() == 3: self.units.sort(key = lambda entry: entry['hp'], reverse = True)
-        elif event.GetColumn() == 4: self.units.sort(key = lambda entry: entry['notes'])
+        if event.GetColumn() == 1: self.units.sort(key = lambda entry: entry['name'])
+        elif event.GetColumn() == 2: self.units.sort(key = lambda entry: entry['initiative'], reverse = True)
+        elif event.GetColumn() == 3: self.units.sort(key = lambda entry: entry['ac'], reverse = True)
+        elif event.GetColumn() == 4: self.units.sort(key = lambda entry: entry['hp'], reverse = True)
+        elif event.GetColumn() == 5: self.units.sort(key = lambda entry: entry['notes'])
         self.refreshMgmt()
 
     def cycleUnits(self):
