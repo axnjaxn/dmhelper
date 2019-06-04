@@ -237,6 +237,9 @@ class MainFrame(wx.Frame):
         middleBox = wx.BoxSizer(wx.HORIZONTAL)
 
         innerBox = wx.BoxSizer(wx.HORIZONTAL)
+        clearBtn = wx.Button(self, 0, "Clear Initiative")
+        clearBtn.Bind(wx.EVT_BUTTON, lambda event: self.clearInitiative())
+        innerBox.Add(clearBtn, 0, wx.ALIGN_CENTER | wx.EXPAND | wx.ALL, 1)
         rollBtn = wx.Button(self, 0, "Roll Initiative")
         rollBtn.Bind(wx.EVT_BUTTON, lambda event: self.rollInitiative())
         innerBox.Add(rollBtn, 0, wx.ALIGN_CENTER | wx.EXPAND | wx.ALL, 1)
@@ -368,7 +371,7 @@ class MainFrame(wx.Frame):
         self.mgmt.SetColumnWidth(2, wx.LIST_AUTOSIZE_USEHEADER)
         self.mgmt.SetColumnWidth(3, wx.LIST_AUTOSIZE_USEHEADER)
         self.mgmt.SetColumnWidth(4, wx.LIST_AUTOSIZE_USEHEADER)
-        self.mgmt.SetColumnWidth(4, wx.LIST_AUTOSIZE_USEHEADER)
+        self.mgmt.SetColumnWidth(5, wx.LIST_AUTOSIZE_USEHEADER)
 
         self.mgmt.Bind(wx.EVT_LIST_COL_CLICK, self.colClicked)
 
@@ -437,6 +440,12 @@ class MainFrame(wx.Frame):
             for unit in toremove:
                 self.units.remove(unit)
             self.refreshMgmt()
+
+    def clearInitiative(self):
+        selected = self.selectedUnits()
+        for idx in selected:
+            self.units[idx]['initiative'] = None
+        self.refreshMgmt()
 
     def rollInitiative(self):
         selected = self.selectedUnits()
