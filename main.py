@@ -329,7 +329,7 @@ class MainFrame(wx.Frame):
         self.refreshMgmt()
 
     def openPreview(self):
-        if len(self.units) == 0: return
+        if len(self.units) == 0 or 'image' not in self.units[0]: return
 
         dlg = ImagePreviewDialog(self.units[0], self)
         dlg.ShowModal()
