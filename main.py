@@ -1,4 +1,4 @@
-import wx, os, random, webbrowser, json, copy, uuid
+import wx, os, random, webbrowser, json, copy, uuid, operator
 
 class EditUnitDialog(wx.Dialog):
     def __init__(self, *args, **kw):
@@ -374,7 +374,8 @@ class MainFrame(wx.Frame):
 
     def colClicked(self, event):
         if event.GetColumn() == 1: self.units.sort(key = lambda entry: entry['name'])
-        elif event.GetColumn() == 2: self.units.sort(key = lambda entry: entry['initiative'], reverse = True)
+        elif event.GetColumn() == 2:
+            self.units.sort(key = operator.itemgetter('initiative', 'dex'), reverse = True)
         elif event.GetColumn() == 3: self.units.sort(key = lambda entry: entry['ac'], reverse = True)
         elif event.GetColumn() == 4: self.units.sort(key = lambda entry: entry['hp'], reverse = True)
         elif event.GetColumn() == 5: self.units.sort(key = lambda entry: entry['notes'])
