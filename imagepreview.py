@@ -13,6 +13,14 @@ class ImagePreviewDialog(wx.Dialog):
         if 'image' not in unit: raise Exception('Unit does not have an image')
         if not self.bmp.LoadFile(unit['image']): raise Exception('Could not load %s' % (unit['image']))
 
+        screen_size = wx.DisplaySize()
+        image_size = self.bmp.GetSize()
+        scale = min(min((screen_size[0] - 20.0) / image_size[0], 0.5 * screen_size[1] / image_size[1]), 1.0)
+        if scale < 1.0:
+            image = self.bmp.ConvertToImage()
+            image = image.Scale(int(scale * image_size[0]), int(scale * image_size[1]), wx.IMAGE_QUALITY_BICUBIC)
+            self.bmp = wx.Bitmap(image)
+
         self.imageFrame = wx.StaticBitmap(self, 0, self.bmp)
         outerBox.Add(self.imageFrame, 0, wx.ALIGN_CENTER | wx.EXPAND | wx.ALL, 0)
 

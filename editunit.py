@@ -37,8 +37,18 @@ class EditUnitDialog(wx.Dialog):
         outerBox = wx.BoxSizer(wx.VERTICAL)
 
         if self.image is not None:
-            if not self.bmp.LoadFile(self.image): raise Exception()
+            if not self.bmp.LoadFile(self.image): raise Exception('Could not load image')
+
+            screen_size = wx.DisplaySize()
+            image_size = self.bmp.GetSize()
+            scale = min(min((screen_size[0] - 20.0) / image_size[0], 0.5 * screen_size[1] / image_size[1]), 1.0)
+            if scale < 1.0:
+                image = self.bmp.ConvertToImage()
+                image = image.Scale(int(scale * image_size[0]), int(scale * image_size[1]), wx.IMAGE_QUALITY_BICUBIC)
+                self.bmp = wx.Bitmap(image)
+
             self.imageFrame = wx.StaticBitmap(self, 0, self.bmp)
+
             innerBox = wx.BoxSizer(wx.HORIZONTAL)
             panel = wx.Panel(self)
             panel.SetBackgroundColour(self.GetBackgroundColour())
@@ -52,6 +62,7 @@ class EditUnitDialog(wx.Dialog):
             removeBtn.Bind(wx.EVT_BUTTON, lambda event: self.removeImage())
             outerBox.Add(removeBtn,
                          0, wx.ALIGN_CENTER | wx.EXPAND | wx.ALL, 1)
+
         else:
             addBtn = wx.Button(self, 0, "Paste Image")
             addBtn.Bind(wx.EVT_BUTTON, lambda event: self.pasteImage())
