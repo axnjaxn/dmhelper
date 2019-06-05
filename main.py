@@ -2,6 +2,7 @@ import wx, os, random, webbrowser, json, copy, operator
 from editunit import *
 from imagepreview import *
 from unitdict import *
+from initiative import *
 
 class MainFrame(wx.Frame):
     def __init__(self, parent):
@@ -158,6 +159,18 @@ class MainFrame(wx.Frame):
                 self.mgmt.Select(i, False)
         return selected
 
+    def playerUnits(self):
+        pcs = []
+        for unit in self.units:
+            if unit['pc']: pcs.append(unit)
+        return pcs
+
+    def nonPlayerUnits(self):
+        npcs = []
+        for unit in self.units:
+            if not unit['pc']: npcs.append(unit)
+        return npcs
+
     def refreshMgmt(self):
         self.mgmt.ClearAll()
 
@@ -258,14 +271,30 @@ class MainFrame(wx.Frame):
 
     def clearInitiative(self):
         selected = self.selectedUnits()
-        for idx in selected:
-            self.units[idx]['initiative'] = None
+        if len(selected) == 0:
+            dlg = wx.MessageDialog(self, 'Clear initiative for all units?', caption='Clear initiative?', style=wx.YES_NO|wx.CENTER)
+            if dlg.ShowModal() == wx.ID_YES:
+                for unit in self.units:
+                    unit['initiative'] = None
+        else:
+            for idx in selected:
+                self.units[idx]['initiative'] = None
         self.refreshMgmt()
 
     def rollInitiative(self):
         selected = self.selectedUnits()
-        for idx in selected:
-            self.units[idx]['initiative'] = random.randint(1, 20) + self.units[idx]['dex']
+
+        roll = lambda unit: random.randint(1, 20) + unit['dex']
+
+        if len(selected) > 0:
+            for idx in selected:
+                self.units[idx]['initiative'] = roll(self.units[idx])
+        else:
+            dlg = InitiativeDialog(self.playerUnits(), self)
+            if dlg.ShowModal() == wx.ID_OK:
+                for unit in self.nonPlayerUnits():
+                    unit['initiative'] = roll(unit)
+            dlg.Destroy()
         self.refreshMgmt()
 
     def _getLettering(self, name):
