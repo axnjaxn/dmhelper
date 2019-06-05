@@ -232,6 +232,9 @@ class MainFrame(wx.Frame):
 
         self.refreshMgmt()
 
+        for i in selected:
+            self.mgmt.Select(i, True)
+
     def removeUnits(self, event):
         selected = self.selectedUnits()
         if len(selected) == 0: return
