@@ -1,6 +1,7 @@
 import wx, os, random, webbrowser, json, copy, operator
 from editunit import *
 from imagepreview import *
+from unitdict import *
 
 class MainFrame(wx.Frame):
     def __init__(self, parent):
@@ -54,6 +55,9 @@ class MainFrame(wx.Frame):
         reletterBtn = wx.Button(self, 0, "Reletter Units")
         reletterBtn.Bind(wx.EVT_BUTTON, lambda event: self.reletter())
         innerBox.Add(reletterBtn, 0, wx.ALIGN_CENTER | wx.EXPAND | wx.ALL, 1)
+        dictionaryBtn = wx.Button(self, 0, "Unit Lookup")
+        dictionaryBtn.Bind(wx.EVT_BUTTON, lambda event: self.dictionary())
+        innerBox.Add(dictionaryBtn, 0, wx.ALIGN_CENTER | wx.EXPAND | wx.ALL, 1)
         middleBox.Add(innerBox, 1, wx.ALIGN_CENTER | wx.EXPAND | wx.ALL, 1)
 
         middleBox.AddSpacer(40)
@@ -292,6 +296,13 @@ class MainFrame(wx.Frame):
 
         self.refreshMgmt()
 
+    def dictionary(self):
+        dlg = UnitDictDialog(self)
+        if dlg.ShowModal() == wx.ID_OK:
+            self.units.append(dlg.getUnit())
+            self.refreshMgmt()
+        dlg.Destroy()
+
     def doDamage(self, pts):
         try:
             pts = int(pts)
@@ -322,7 +333,11 @@ class MainFrame(wx.Frame):
         url = 'https://roll20.net/compendium/dnd5e/searchbook/?terms=%s' % (queryStr)
         webbrowser.open_new_tab(url)
 
-    def read(self): self.units = json.load(open('dmhelper.json', 'r'))
+    def read(self):
+        if os.path.isfile('dmhelper.json'):
+            self.units = json.load(open('dmhelper.json', 'r'))
+        else:
+            self.units = []
 
     def write(self): json.dump(self.units, open('dmhelper.json', 'w'), indent=4)
 

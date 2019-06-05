@@ -1,5 +1,7 @@
 import wx, uuid
 
+from unitdict import *
+
 class EditUnitDialog(wx.Dialog):
     def __init__(self, *args, **kw):
         super(EditUnitDialog, self).__init__(*args, **kw)
@@ -84,6 +86,9 @@ class EditUnitDialog(wx.Dialog):
         innerBox.Add(wx.StaticText(self, 0, "Notes"),
                      0, wx.ALIGN_CENTER | wx.EXPAND | wx.ALL, 1)
         innerBox.Add(self.notesBox, 1, wx.ALIGN_CENTER | wx.EXPAND | wx.ALL, 1)
+        saveBtn = wx.Button(self, 0, "Save to dictionary")
+        saveBtn.Bind(wx.EVT_BUTTON, lambda event: self.saveUnit())
+        innerBox.Add(saveBtn, 0, wx.ALIGN_CENTER | wx.EXPAND | wx.ALL, 1)
         outerBox.Add(innerBox, 0, wx.ALIGN_CENTER | wx.EXPAND | wx.ALL, 1)
 
         okBtn = wx.Button(self, 0, "OK")
@@ -116,6 +121,21 @@ class EditUnitDialog(wx.Dialog):
         self.bmp = None
         self.imageFrame.Hide()
         self.rebuild()
+
+    def saveUnit(self):
+        udict = UnitDict()
+        unit = self.getUnit()
+        if udict.has(unit['name']):
+            dlg = wx.MessageDialog(self, 'Replace previous entry for "%s"?' % (unit['name'].strip()), caption='Overwrite unit', style=wx.YES_NO|wx.CENTER)
+            if dlg.ShowModal() == wx.ID_YES:
+                udict.add(unit)
+                udict.write()
+        else:
+            udict.add(unit)
+            udict.write()
+            dlg = wx.MessageDialog(self, '', caption='Unit saved', style=wx.OK|wx.CENTER)
+            dlg.ShowModal()
+
 
     def setUnit(self, unit):
         if 'image' in unit:
