@@ -82,15 +82,18 @@ class EditUnitDialog(wx.Dialog):
         innerBox.Add(wx.StaticText(self, 0, "Dex"),
                      0, wx.ALIGN_CENTER | wx.EXPAND | wx.ALL, 1)
         innerBox.Add(self.dexBox, 0, wx.ALIGN_CENTER | wx.EXPAND | wx.ALL, 1)
-        innerBox.Add(wx.StaticText(self, 0, "Init"),
-                     0, wx.ALIGN_CENTER | wx.EXPAND | wx.ALL, 1)
-        innerBox.Add(self.initBox, 0, wx.ALIGN_CENTER | wx.EXPAND | wx.ALL, 1)
         innerBox.Add(wx.StaticText(self, 0, "AC"),
                      0, wx.ALIGN_CENTER | wx.EXPAND | wx.ALL, 1)
         innerBox.Add(self.acBox, 0, wx.ALIGN_CENTER | wx.EXPAND | wx.ALL, 1)
         innerBox.Add(wx.StaticText(self, 0, "HP"),
                      0, wx.ALIGN_CENTER | wx.EXPAND | wx.ALL, 1)
         innerBox.Add(self.hpBox, 0, wx.ALIGN_CENTER | wx.EXPAND | wx.ALL, 1)
+
+        innerBox.Add(wx.Panel(self), 1, wx.ALIGN_CENTER | wx.EXPAND | wx.ALL, 0)
+
+        innerBox.Add(wx.StaticText(self, 0, "Init"),
+                     0, wx.ALIGN_CENTER | wx.EXPAND | wx.ALL, 1)
+        innerBox.Add(self.initBox, 0, wx.ALIGN_CENTER | wx.EXPAND | wx.ALL, 1)
         outerBox.Add(innerBox, 0, wx.ALIGN_CENTER | wx.EXPAND | wx.ALL, 1)
 
         innerBox = wx.BoxSizer(wx.HORIZONTAL)
