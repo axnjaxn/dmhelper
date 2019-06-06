@@ -44,8 +44,6 @@ class MainFrame(wx.Frame):
 
         outerBox.AddSpacer(15)
 
-        middleBox = wx.BoxSizer(wx.HORIZONTAL)
-
         innerBox = wx.BoxSizer(wx.HORIZONTAL)
         clearBtn = wx.Button(self, 0, "Clear Initiative")
         clearBtn.Bind(wx.EVT_BUTTON, lambda event: self.clearInitiative())
@@ -59,24 +57,17 @@ class MainFrame(wx.Frame):
         dictionaryBtn = wx.Button(self, 0, "Unit Lookup")
         dictionaryBtn.Bind(wx.EVT_BUTTON, lambda event: self.dictionary())
         innerBox.Add(dictionaryBtn, 0, wx.ALIGN_CENTER | wx.EXPAND | wx.ALL, 1)
-        middleBox.Add(innerBox, 1, wx.ALIGN_CENTER | wx.EXPAND | wx.ALL, 1)
-
-        middleBox.AddSpacer(40)
-
-        innerBox = wx.BoxSizer(wx.HORIZONTAL)
+        innerBox.Add(wx.Panel(self), 1, wx.ALIGN_CENTER | wx.EXPAND | wx.ALL, 1)
         self.dmgBox = wx.TextCtrl(self, style=wx.TE_PROCESS_ENTER)
         self.dmgBox.Bind(wx.EVT_TEXT_ENTER, lambda event: self.doDamage(self.dmgBox.GetValue()))
         innerBox.Add(self.dmgBox, 0, wx.ALIGN_CENTER | wx.EXPAND | wx.ALL, 1)
         rollBtn = wx.Button(self, 0, "Do damage")
         rollBtn.Bind(wx.EVT_BUTTON, lambda event: self.doDamage(self.dmgBox.GetValue()))
         innerBox.Add(rollBtn, 0, wx.ALIGN_CENTER | wx.EXPAND | wx.ALL, 1)
-        middleBox.Add(innerBox, 0, wx.ALIGN_CENTER | wx.EXPAND | wx.ALL, 1)
 
-        outerBox.Add(middleBox, 0, wx.ALIGN_CENTER | wx.EXPAND | wx.ALL, 1)
+        outerBox.Add(innerBox, 0, wx.ALIGN_CENTER | wx.EXPAND | wx.ALL, 1)
 
         outerBox.AddSpacer(15)
-
-        middleBox = wx.BoxSizer(wx.HORIZONTAL)
 
         innerBox = wx.BoxSizer(wx.HORIZONTAL)
         self.rollBox1 = wx.TextCtrl(self, style=wx.TE_PROCESS_ENTER)
@@ -89,11 +80,7 @@ class MainFrame(wx.Frame):
         rollBtn = wx.Button(self, 0, "Roll")
         rollBtn.Bind(wx.EVT_BUTTON, lambda event: self.roll(self.rollBox1.GetValue(), self.rollBox2.GetValue()))
         innerBox.Add(rollBtn, 0, wx.ALIGN_CENTER | wx.EXPAND | wx.ALL, 1)
-        middleBox.Add(innerBox, 1, wx.ALIGN_CENTER | wx.EXPAND | wx.ALL, 1)
-
-        middleBox.AddSpacer(40)
-
-        innerBox = wx.BoxSizer(wx.HORIZONTAL)
+        innerBox.Add(wx.Panel(self), 1, wx.ALIGN_CENTER | wx.EXPAND | wx.ALL, 1)
         innerBox.Add(wx.StaticText(self, 0, "Search"),
                      0, wx.ALIGN_CENTER | wx.EXPAND | wx.ALL, 1)
         self.searchBox = wx.TextCtrl(self, style=wx.TE_PROCESS_ENTER)
@@ -102,9 +89,8 @@ class MainFrame(wx.Frame):
         searchBtn = wx.Button(self, 0, "Go")
         searchBtn.Bind(wx.EVT_BUTTON, lambda event: self.search(self.searchBox.GetValue()))
         innerBox.Add(searchBtn, 0, wx.ALIGN_CENTER | wx.EXPAND | wx.ALL, 1)
-        middleBox.Add(innerBox, 1, wx.ALIGN_CENTER | wx.EXPAND | wx.ALL, 1)
 
-        outerBox.Add(middleBox, 0, wx.ALIGN_CENTER | wx.EXPAND | wx.ALL, 1)
+        outerBox.Add(innerBox, 0, wx.ALIGN_CENTER | wx.EXPAND | wx.ALL, 1)
 
         self.SetSizer(outerBox)
 
