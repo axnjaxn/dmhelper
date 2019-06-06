@@ -18,6 +18,8 @@ class MainFrame(wx.Frame):
         self.mgmt.Bind(wx.EVT_LIST_ITEM_ACTIVATED, self.onListItemActivated)
         outerBox.Add(self.mgmt, 1, wx.ALIGN_CENTER | wx.EXPAND | wx.ALL, 5)
 
+        # Unit controls
+
         innerBox = wx.BoxSizer(wx.HORIZONTAL)
 
         addBtn = wx.Button(self, 0, "-")
@@ -44,6 +46,8 @@ class MainFrame(wx.Frame):
 
         outerBox.AddSpacer(15)
 
+        # Initiative and damage controls
+
         innerBox = wx.BoxSizer(wx.HORIZONTAL)
         clearBtn = wx.Button(self, 0, "Clear Initiative")
         clearBtn.Bind(wx.EVT_BUTTON, lambda event: self.clearInitiative())
@@ -58,28 +62,75 @@ class MainFrame(wx.Frame):
         dictionaryBtn.Bind(wx.EVT_BUTTON, lambda event: self.dictionary())
         innerBox.Add(dictionaryBtn, 0, wx.ALIGN_CENTER | wx.EXPAND | wx.ALL, 1)
         innerBox.Add(wx.Panel(self), 1, wx.ALIGN_CENTER | wx.EXPAND | wx.ALL, 1)
-        self.dmgBox = wx.TextCtrl(self, style=wx.TE_PROCESS_ENTER)
-        self.dmgBox.Bind(wx.EVT_TEXT_ENTER, lambda event: self.doDamage(self.dmgBox.GetValue()))
-        innerBox.Add(self.dmgBox, 0, wx.ALIGN_CENTER | wx.EXPAND | wx.ALL, 1)
+        dmgBox = wx.TextCtrl(self, style=wx.TE_PROCESS_ENTER, size=(60, -1))
+        dmgBox.Bind(wx.EVT_TEXT_ENTER, lambda event: self.doDamage(dmgBox.GetValue()))
+        innerBox.Add(dmgBox, 0, wx.ALIGN_CENTER | wx.EXPAND | wx.ALL, 1)
         rollBtn = wx.Button(self, 0, "Do damage")
-        rollBtn.Bind(wx.EVT_BUTTON, lambda event: self.doDamage(self.dmgBox.GetValue()))
+        rollBtn.Bind(wx.EVT_BUTTON, lambda event: self.doDamage(dmgBox.GetValue()))
         innerBox.Add(rollBtn, 0, wx.ALIGN_CENTER | wx.EXPAND | wx.ALL, 1)
 
         outerBox.Add(innerBox, 0, wx.ALIGN_CENTER | wx.EXPAND | wx.ALL, 1)
 
         outerBox.AddSpacer(15)
 
+        # Dice controls
+
         innerBox = wx.BoxSizer(wx.HORIZONTAL)
+
+        totalBox = wx.TextCtrl(self, style=wx.TE_READONLY, size=(40, -1))
+
+        addRoll = lambda value: str(value + int(totalBox.GetValue() or 0))
+
+        innerBox.Add(wx.StaticText(self, 0, 'Roll'), 0, wx.ALIGN_CENTER | wx.EXPAND | wx.ALL, 1)
+
+        btn = wx.Button(self, 0, '1', style=wx.BU_EXACTFIT)
+        btn.Bind(wx.EVT_BUTTON, lambda event: totalBox.SetValue(addRoll(1)))
+        innerBox.Add(btn, 0, wx.ALIGN_CENTER | wx.EXPAND | wx.ALL, 1)
+
+        btn = wx.Button(self, 0, '4', style=wx.BU_EXACTFIT)
+        btn.Bind(wx.EVT_BUTTON, lambda event: totalBox.SetValue(addRoll(random.randint(1, 4))))
+        innerBox.Add(btn, 0, wx.ALIGN_CENTER | wx.EXPAND | wx.ALL, 1)
+
+        btn = wx.Button(self, 0, '6', style=wx.BU_EXACTFIT)
+        btn.Bind(wx.EVT_BUTTON, lambda event: totalBox.SetValue(addRoll(random.randint(1, 6))))
+        innerBox.Add(btn, 0, wx.ALIGN_CENTER | wx.EXPAND | wx.ALL, 1)
+
+        btn = wx.Button(self, 0, '8', style=wx.BU_EXACTFIT)
+        btn.Bind(wx.EVT_BUTTON, lambda event: totalBox.SetValue(addRoll(random.randint(1, 8))))
+        innerBox.Add(btn, 0, wx.ALIGN_CENTER | wx.EXPAND | wx.ALL, 1)
+
+        btn = wx.Button(self, 0, '10', style=wx.BU_EXACTFIT)
+        btn.Bind(wx.EVT_BUTTON, lambda event: totalBox.SetValue(addRoll(random.randint(1, 10))))
+        innerBox.Add(btn, 0, wx.ALIGN_CENTER | wx.EXPAND | wx.ALL, 1)
+
+        btn = wx.Button(self, 0, '12', style=wx.BU_EXACTFIT)
+        btn.Bind(wx.EVT_BUTTON, lambda event: totalBox.SetValue(addRoll(random.randint(1, 12))))
+        innerBox.Add(btn, 0, wx.ALIGN_CENTER | wx.EXPAND | wx.ALL, 1)
+
+        btn = wx.Button(self, 0, '20', style=wx.BU_EXACTFIT)
+        btn.Bind(wx.EVT_BUTTON, lambda event: totalBox.SetValue(addRoll(random.randint(1, 20))))
+        innerBox.Add(btn, 0, wx.ALIGN_CENTER | wx.EXPAND | wx.ALL, 1)
+
+        btn = wx.Button(self, 0, '100', style=wx.BU_EXACTFIT)
+        btn.Bind(wx.EVT_BUTTON, lambda event: totalBox.SetValue(addRoll(random.randint(1, 100))))
+        innerBox.Add(btn, 0, wx.ALIGN_CENTER | wx.EXPAND | wx.ALL, 1)
+
+        innerBox.Add(totalBox, 0, wx.ALIGN_CENTER | wx.EXPAND | wx.ALL, 1)
+
+        btn = wx.Button(self, 0, 'C', style=wx.BU_EXACTFIT)
+        btn.Bind(wx.EVT_BUTTON, lambda event: totalBox.SetValue(''))
+        innerBox.Add(btn, 0, wx.ALIGN_CENTER | wx.EXPAND | wx.ALL, 1)
+
         innerBox.Add(wx.Panel(self), 1, wx.ALIGN_CENTER | wx.EXPAND | wx.ALL, 1)
-        self.rollBox1 = wx.TextCtrl(self, style=wx.TE_PROCESS_ENTER)
-        self.rollBox1.Bind(wx.EVT_TEXT_ENTER, lambda event: self.roll(self.rollBox1.GetValue(), self.rollBox2.GetValue()))
-        innerBox.Add(self.rollBox1, 0, wx.ALIGN_CENTER | wx.EXPAND | wx.ALL, 1)
+        rollBox1 = wx.TextCtrl(self, style=wx.TE_PROCESS_ENTER, size=(60, -1))
+        rollBox1.Bind(wx.EVT_TEXT_ENTER, lambda event: self.roll(rollBox1.GetValue(), rollBox2.GetValue()))
+        innerBox.Add(rollBox1, 0, wx.ALIGN_CENTER | wx.EXPAND | wx.ALL, 1)
         innerBox.Add(wx.StaticText(self, 0, "d"), 0, wx.ALIGN_CENTER | wx.EXPAND | wx.ALL, 1)
-        self.rollBox2 = wx.TextCtrl(self, style=wx.TE_PROCESS_ENTER)
-        self.rollBox2.Bind(wx.EVT_TEXT_ENTER, lambda event: self.roll(self.rollBox1.GetValue(), self.rollBox2.GetValue()))
-        innerBox.Add(self.rollBox2, 0, wx.ALIGN_CENTER | wx.EXPAND | wx.ALL, 1)
+        rollBox2 = wx.TextCtrl(self, style=wx.TE_PROCESS_ENTER, size=(60, -1))
+        rollBox2.Bind(wx.EVT_TEXT_ENTER, lambda event: self.roll(rollBox1.GetValue(), rollBox2.GetValue()))
+        innerBox.Add(rollBox2, 0, wx.ALIGN_CENTER | wx.EXPAND | wx.ALL, 1)
         rollBtn = wx.Button(self, 0, "Roll")
-        rollBtn.Bind(wx.EVT_BUTTON, lambda event: self.roll(self.rollBox1.GetValue(), self.rollBox2.GetValue()))
+        rollBtn.Bind(wx.EVT_BUTTON, lambda event: self.roll(rollBox1.GetValue(), rollBox2.GetValue()))
         innerBox.Add(rollBtn, 0, wx.ALIGN_CENTER | wx.EXPAND | wx.ALL, 1)
 
         outerBox.Add(innerBox, 0, wx.ALIGN_CENTER | wx.EXPAND | wx.ALL, 1)
