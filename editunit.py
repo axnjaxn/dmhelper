@@ -20,7 +20,7 @@ class EditUnitDialog(wx.Dialog):
 
         self.rebuild()
 
-    def rebuild(self):
+    def rebuild(self, unit = None):
         self.DestroyChildren()
 
         self.nameBox = wx.TextCtrl(self, style=wx.TE_PROCESS_ENTER)
@@ -36,6 +36,15 @@ class EditUnitDialog(wx.Dialog):
         self.initBox.Bind(wx.EVT_TEXT_ENTER, lambda event: self.NavigateIn())
         self.notesBox = wx.TextCtrl(self, style=wx.TE_PROCESS_ENTER)
         self.notesBox.Bind(wx.EVT_TEXT_ENTER, lambda event: self.OK())
+
+        if unit is not None:
+            self.nameBox.SetValue(unit['name'])
+            self.pcBox.SetValue(unit['pc'])
+            self.dexBox.SetValue(str(unit['dex']))
+            self.initBox.SetValue(str(unit['initiative'] or ''))
+            self.acBox.SetValue(str(unit['ac']))
+            self.hpBox.SetValue(str(unit['hp']))
+            self.notesBox.SetValue(unit['notes'])
 
         self.SetTitle("Edit Unit")
 
@@ -166,14 +175,8 @@ class EditUnitDialog(wx.Dialog):
         else:
             self.image = None
             self.bmp = None
-        self.nameBox.SetValue(unit['name'])
-        self.pcBox.SetValue(unit['pc'])
-        self.dexBox.SetValue(str(unit['dex']))
-        self.initBox.SetValue(str(unit['initiative'] or ''))
-        self.acBox.SetValue(str(unit['ac']))
-        self.hpBox.SetValue(str(unit['hp']))
-        self.notesBox.SetValue(unit['notes'])
-        self.rebuild()
+
+        self.rebuild(unit)
 
     def isValid(self):
         try:
