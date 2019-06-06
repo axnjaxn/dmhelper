@@ -1,4 +1,4 @@
-import wx, os, random, webbrowser, json, copy, operator
+import wx, os, random, json, copy, operator
 from editunit import *
 from imagepreview import *
 from unitdict import *
@@ -70,6 +70,7 @@ class MainFrame(wx.Frame):
         outerBox.AddSpacer(15)
 
         innerBox = wx.BoxSizer(wx.HORIZONTAL)
+        innerBox.Add(wx.Panel(self), 1, wx.ALIGN_CENTER | wx.EXPAND | wx.ALL, 1)
         self.rollBox1 = wx.TextCtrl(self, style=wx.TE_PROCESS_ENTER)
         self.rollBox1.Bind(wx.EVT_TEXT_ENTER, lambda event: self.roll(self.rollBox1.GetValue(), self.rollBox2.GetValue()))
         innerBox.Add(self.rollBox1, 0, wx.ALIGN_CENTER | wx.EXPAND | wx.ALL, 1)
@@ -80,15 +81,6 @@ class MainFrame(wx.Frame):
         rollBtn = wx.Button(self, 0, "Roll")
         rollBtn.Bind(wx.EVT_BUTTON, lambda event: self.roll(self.rollBox1.GetValue(), self.rollBox2.GetValue()))
         innerBox.Add(rollBtn, 0, wx.ALIGN_CENTER | wx.EXPAND | wx.ALL, 1)
-        innerBox.Add(wx.Panel(self), 1, wx.ALIGN_CENTER | wx.EXPAND | wx.ALL, 1)
-        innerBox.Add(wx.StaticText(self, 0, "Search"),
-                     0, wx.ALIGN_CENTER | wx.EXPAND | wx.ALL, 1)
-        self.searchBox = wx.TextCtrl(self, style=wx.TE_PROCESS_ENTER)
-        self.searchBox.Bind(wx.EVT_TEXT_ENTER, lambda event: self.search(self.searchBox.GetValue()))
-        innerBox.Add(self.searchBox, 1, wx.ALIGN_CENTER | wx.EXPAND | wx.ALL, 1)
-        searchBtn = wx.Button(self, 0, "Go")
-        searchBtn.Bind(wx.EVT_BUTTON, lambda event: self.search(self.searchBox.GetValue()))
-        innerBox.Add(searchBtn, 0, wx.ALIGN_CENTER | wx.EXPAND | wx.ALL, 1)
 
         outerBox.Add(innerBox, 0, wx.ALIGN_CENTER | wx.EXPAND | wx.ALL, 1)
 
@@ -343,10 +335,6 @@ class MainFrame(wx.Frame):
             if i > 0: s = s + ', '
             s = s + str(rolls[-1])
         wx.MessageDialog(self, "%s\nTotal: %d" % (s, sum(rolls)), caption="Rolls", style = wx.OK | wx.CENTRE).ShowModal()
-
-    def search(self, queryStr):
-        url = 'https://roll20.net/compendium/dnd5e/searchbook/?terms=%s' % (queryStr)
-        webbrowser.open_new_tab(url)
 
     def read(self):
         if os.path.isfile('dmhelper.json'):
