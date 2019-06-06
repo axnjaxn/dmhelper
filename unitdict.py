@@ -83,6 +83,7 @@ class UnitDictDialog(wx.Dialog):
                     self.udict.remove(self.names[i])
                     self.udict.write()
                     self.refresh()
+                break
 
     def select(self, idx):
         self.selected = self.udict.get(self.names[idx])
