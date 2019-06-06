@@ -8,6 +8,7 @@ class EditUnitDialog(wx.Dialog):
 
         self.bmp = wx.Bitmap()
         self.image = None
+        self.save_image = False
         self.nameBox = wx.TextCtrl(self, style=wx.TE_PROCESS_ENTER)
         self.nameBox.Bind(wx.EVT_TEXT_ENTER, lambda event: self.NavigateIn())
         self.pcBox = wx.CheckBox(self)
@@ -23,6 +24,7 @@ class EditUnitDialog(wx.Dialog):
         self.notesBox.Bind(wx.EVT_TEXT_ENTER, lambda event: self.OK())
 
         idClose = wx.NewId()
+        self.Bind(wx.EVT_CLOSE, self.OnClose)
         self.Bind(wx.EVT_MENU, lambda event: self.Close(), id=idClose)
         accel_tbl = wx.AcceleratorTable([
             (wx.ACCEL_NORMAL, wx.WXK_ESCAPE , idClose)
@@ -135,7 +137,7 @@ class EditUnitDialog(wx.Dialog):
             parent = self.GetParent()
             if not parent.hasImage(self.image):
                 parent.removeImage(self.image)
-        
+
         self.image = None
         self.bmp = None
         self.imageFrame.Hide()
@@ -183,6 +185,7 @@ class EditUnitDialog(wx.Dialog):
         return True
 
     def OK(self):
+        if self.image is not None: self.save_image = True
         if self.isValid(): self.EndModal(wx.ID_OK)
 
     def getUnit(self):
@@ -201,6 +204,7 @@ class EditUnitDialog(wx.Dialog):
             unit['image'] = self.image
         return unit
 
-
-    def OnClose(self, e):
-        self.Destroy()
+    def OnClose(self, event):
+        if self.image is not None and not self.save_image:
+            self.GetParent().removeImage(self.image)
+        event.Skip()
