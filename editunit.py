@@ -131,6 +131,11 @@ class EditUnitDialog(wx.Dialog):
             cb.Close()
 
     def removeImage(self):
+        if self.image is not None:
+            parent = self.GetParent()
+            if not parent.hasImage(self.image):
+                parent.removeImage(self.image)
+        
         self.image = None
         self.bmp = None
         self.imageFrame.Hide()

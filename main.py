@@ -8,6 +8,7 @@ class MainFrame(wx.Frame):
     def __init__(self, parent):
         wx.Frame.__init__(self, parent, title = "DM Helper", style = wx.DEFAULT_FRAME_STYLE)
         self.units = []
+        self.imagesToRemove = []
 
         self.SetMinSize((800, 600))
         self.SetSize((800, 600))
@@ -281,6 +282,22 @@ class MainFrame(wx.Frame):
         for i in selected:
             self.mgmt.Select(i, True)
 
+    def hasImage(self, image):
+        for unit in self.units:
+            if 'image' in unit and unit['image'] == image:
+                return True
+        return UnitDict().hasImage(image)
+
+    # Note: these are actually removed when write() is called
+    def removeImage(self, image):
+        self.imagesToRemove.append(image)
+    
+    def removeUnit(self, unit):
+        self.units.remove(unit)
+        if 'image' in unit:
+            if not self.hasImage(unit['image']):
+                self.removeImage(unit['image'])
+
     def removeUnits(self, event):
         selected = self.selectedUnits()
         if len(selected) == 0: return
@@ -295,7 +312,7 @@ class MainFrame(wx.Frame):
         dlg = wx.MessageDialog(self, s, caption="Remove these units?", style=wx.YES_NO|wx.CENTER)
         if dlg.ShowModal() == wx.ID_YES:
             for unit in toremove:
-                self.units.remove(unit)
+                self.removeUnit(unit)
             self.refreshMgmt()
 
     def clearInitiative(self):
@@ -392,8 +409,13 @@ class MainFrame(wx.Frame):
             self.units = json.load(open('dmhelper.json', 'r'))
         else:
             self.units = []
+        self.imagesToRemove = []
 
-    def write(self): json.dump(self.units, open('dmhelper.json', 'w'), indent=4)
+    def write(self):
+        json.dump(self.units, open('dmhelper.json', 'w'), indent=4)
+        for image in self.imagesToRemove:
+            os.remove(image)
+        self.imagesToRemove = []
 
 app = wx.App()
 frame = MainFrame(None)

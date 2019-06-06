@@ -32,6 +32,13 @@ class UnitDict:
 
     def write(self): json.dump(self.units, open('units.json', 'w'), indent=4)
 
+    def hasImage(self, image):
+        for name in self.units:
+            unit = self.units[name]
+            if 'image' in unit and unit['image'] == image:
+                return True
+        return False
+
 class UnitDictDialog(wx.Dialog):
     def __init__(self, *args, **kw):
         super(UnitDictDialog, self).__init__(*args, **kw)
@@ -80,8 +87,13 @@ class UnitDictDialog(wx.Dialog):
             if self.selector.IsSelected(i):
                 dlg = wx.MessageDialog(self, 'Are you sure you want to remove "%s"?' % (self.names[i]), caption='Remove unit', style=wx.YES_NO|wx.CENTER)
                 if dlg.ShowModal() == wx.ID_YES:
+                    unit = self.udict.get(self.names[i])
                     self.udict.remove(self.names[i])
                     self.udict.write()
+                    if 'image' in unit:
+                        parent = self.GetParent()
+                        if not parent.hasImage(unit['image']):
+                            parent.removeImage(unit['image'])
                     self.refresh()
                 break
 
