@@ -9,6 +9,20 @@ class EditUnitDialog(wx.Dialog):
         self.bmp = wx.Bitmap()
         self.image = None
         self.save_image = False
+
+        idClose = wx.NewId()
+        self.Bind(wx.EVT_CLOSE, self.OnClose)
+        self.Bind(wx.EVT_MENU, lambda event: self.Close(), id=idClose)
+        accel_tbl = wx.AcceleratorTable([
+            (wx.ACCEL_NORMAL, wx.WXK_ESCAPE , idClose)
+        ])
+        self.SetAcceleratorTable(accel_tbl)
+
+        self.rebuild()
+
+    def rebuild(self):
+        self.DestroyChildren()
+
         self.nameBox = wx.TextCtrl(self, style=wx.TE_PROCESS_ENTER)
         self.nameBox.Bind(wx.EVT_TEXT_ENTER, lambda event: self.NavigateIn())
         self.pcBox = wx.CheckBox(self)
@@ -23,17 +37,6 @@ class EditUnitDialog(wx.Dialog):
         self.notesBox = wx.TextCtrl(self, style=wx.TE_PROCESS_ENTER)
         self.notesBox.Bind(wx.EVT_TEXT_ENTER, lambda event: self.OK())
 
-        idClose = wx.NewId()
-        self.Bind(wx.EVT_CLOSE, self.OnClose)
-        self.Bind(wx.EVT_MENU, lambda event: self.Close(), id=idClose)
-        accel_tbl = wx.AcceleratorTable([
-            (wx.ACCEL_NORMAL, wx.WXK_ESCAPE , idClose)
-        ])
-        self.SetAcceleratorTable(accel_tbl)
-
-        self.rebuild()
-
-    def rebuild(self):
         self.SetTitle("Edit Unit")
 
         outerBox = wx.BoxSizer(wx.VERTICAL)
@@ -53,11 +56,9 @@ class EditUnitDialog(wx.Dialog):
 
             innerBox = wx.BoxSizer(wx.HORIZONTAL)
             panel = wx.Panel(self)
-            panel.SetBackgroundColour(self.GetBackgroundColour())
             innerBox.Add(panel, 1, wx.ALIGN_CENTER | wx.EXPAND | wx.ALL, 0)
             innerBox.Add(self.imageFrame, 0, wx.ALIGN_CENTER | wx.EXPAND | wx.ALL, 0)
             panel = wx.Panel(self)
-            panel.SetBackgroundColour(self.GetBackgroundColour())
             innerBox.Add(panel, 1, wx.ALIGN_CENTER | wx.EXPAND | wx.ALL, 0)
             outerBox.Add(innerBox, 1, wx.ALIGN_CENTER | wx.EXPAND | wx.ALL, 1)
             removeBtn = wx.Button(self, 0, "Remove Image")
