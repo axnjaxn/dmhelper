@@ -171,23 +171,22 @@ class MainFrame(wx.Frame):
             (wx.ACCEL_NORMAL, wx.WXK_RETURN, idCycle),
 
             (wx.ACCEL_NORMAL, ord('c'), idRollClear), # C for Clear
-            (wx.ACCEL_NORMAL, ord('1'), idRoll1),
-            (wx.ACCEL_NORMAL, ord('4'), idRoll4),
-            (wx.ACCEL_NORMAL, ord('6'), idRoll6),
-            (wx.ACCEL_NORMAL, ord('8'), idRoll8),
-            (wx.ACCEL_NORMAL, ord('0'), idRoll10),
-            (wx.ACCEL_NORMAL, ord('2'), idRoll12),
+            (wx.ACCEL_SHIFT, ord('1'), idRoll1),
+            (wx.ACCEL_SHIFT, ord('4'), idRoll4),
+            (wx.ACCEL_SHIFT, ord('6'), idRoll6),
+            (wx.ACCEL_SHIFT, ord('8'), idRoll8),
+            (wx.ACCEL_SHIFT, ord('0'), idRoll10),
+            (wx.ACCEL_SHIFT, ord('2'), idRoll12),
             (wx.ACCEL_NORMAL, ord('s'), idRoll20), # S for Simple D20
             (wx.ACCEL_NORMAL, ord('a'), idRollAdv), # A for Advantage
             (wx.ACCEL_NORMAL, ord('d'), idRollDis), # D for Disadvantage
 
-            (wx.ACCEL_SHIFT, ord('1'), idRollAdd1),
-            (wx.ACCEL_SHIFT, ord('4'), idRollAdd4),
-            (wx.ACCEL_SHIFT, ord('6'), idRollAdd6),
-            (wx.ACCEL_SHIFT, ord('8'), idRollAdd8),
-            (wx.ACCEL_SHIFT, ord('0'), idRollAdd10),
-            (wx.ACCEL_SHIFT, ord('2'), idRollAdd12),
-            (wx.ACCEL_SHIFT, ord('s'), idRollAdd20)
+            (wx.ACCEL_NORMAL, ord('1'), idRollAdd1),
+            (wx.ACCEL_NORMAL, ord('4'), idRollAdd4),
+            (wx.ACCEL_NORMAL, ord('6'), idRollAdd6),
+            (wx.ACCEL_NORMAL, ord('8'), idRollAdd8),
+            (wx.ACCEL_NORMAL, ord('0'), idRollAdd10),
+            (wx.ACCEL_NORMAL, ord('2'), idRollAdd12),
         ])
         self.SetAcceleratorTable(accel_tbl)
 
