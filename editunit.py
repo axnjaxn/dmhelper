@@ -51,7 +51,7 @@ class EditUnitDialog(wx.Dialog):
         outerBox = wx.BoxSizer(wx.VERTICAL)
 
         if self.image is not None:
-            if not self.bmp.LoadFile(self.image): raise Exception('Could not load image')
+            if not self.bmp.LoadFile(self.image): raise Exception('Could not load %s' % (self.image))
 
             screen_size = wx.DisplaySize()
             image_size = self.bmp.GetSize()
@@ -172,6 +172,7 @@ class EditUnitDialog(wx.Dialog):
         if 'image' in unit:
             self.image = unit['image']
             self.bmp.LoadFile(self.image)
+            self.save_image = True
         else:
             self.image = None
             self.bmp = None
