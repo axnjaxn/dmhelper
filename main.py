@@ -78,48 +78,48 @@ class MainFrame(wx.Frame):
 
         innerBox = wx.BoxSizer(wx.HORIZONTAL)
 
-        totalBox = wx.TextCtrl(self, style=wx.TE_READONLY, size=(40, -1))
+        self.totalBox = wx.TextCtrl(self, style=wx.TE_READONLY, size=(40, -1))
 
-        addRoll = lambda value: str(value + int(totalBox.GetValue() or 0))
+        addRoll = lambda value: str(value + int(self.totalBox.GetValue() or 0))
 
         innerBox.Add(wx.StaticText(self, 0, 'Roll'), 0, wx.ALIGN_CENTER | wx.EXPAND | wx.ALL, 1)
 
         btn = wx.Button(self, 0, '1', style=wx.BU_EXACTFIT)
-        btn.Bind(wx.EVT_BUTTON, lambda event: totalBox.SetValue(addRoll(1)))
+        btn.Bind(wx.EVT_BUTTON, lambda event: self.addRoll(1))
         innerBox.Add(btn, 0, wx.ALIGN_CENTER | wx.EXPAND | wx.ALL, 1)
 
         btn = wx.Button(self, 0, '4', style=wx.BU_EXACTFIT)
-        btn.Bind(wx.EVT_BUTTON, lambda event: totalBox.SetValue(addRoll(random.randint(1, 4))))
+        btn.Bind(wx.EVT_BUTTON, lambda event: self.addRoll(4))
         innerBox.Add(btn, 0, wx.ALIGN_CENTER | wx.EXPAND | wx.ALL, 1)
 
         btn = wx.Button(self, 0, '6', style=wx.BU_EXACTFIT)
-        btn.Bind(wx.EVT_BUTTON, lambda event: totalBox.SetValue(addRoll(random.randint(1, 6))))
+        btn.Bind(wx.EVT_BUTTON, lambda event: self.addRoll(6))
         innerBox.Add(btn, 0, wx.ALIGN_CENTER | wx.EXPAND | wx.ALL, 1)
 
         btn = wx.Button(self, 0, '8', style=wx.BU_EXACTFIT)
-        btn.Bind(wx.EVT_BUTTON, lambda event: totalBox.SetValue(addRoll(random.randint(1, 8))))
+        btn.Bind(wx.EVT_BUTTON, lambda event: self.addRoll(8))
         innerBox.Add(btn, 0, wx.ALIGN_CENTER | wx.EXPAND | wx.ALL, 1)
 
         btn = wx.Button(self, 0, '10', style=wx.BU_EXACTFIT)
-        btn.Bind(wx.EVT_BUTTON, lambda event: totalBox.SetValue(addRoll(random.randint(1, 10))))
+        btn.Bind(wx.EVT_BUTTON, lambda event: self.addRoll(10))
         innerBox.Add(btn, 0, wx.ALIGN_CENTER | wx.EXPAND | wx.ALL, 1)
 
         btn = wx.Button(self, 0, '12', style=wx.BU_EXACTFIT)
-        btn.Bind(wx.EVT_BUTTON, lambda event: totalBox.SetValue(addRoll(random.randint(1, 12))))
+        btn.Bind(wx.EVT_BUTTON, lambda event: self.addRoll(12))
         innerBox.Add(btn, 0, wx.ALIGN_CENTER | wx.EXPAND | wx.ALL, 1)
 
         btn = wx.Button(self, 0, '20', style=wx.BU_EXACTFIT)
-        btn.Bind(wx.EVT_BUTTON, lambda event: totalBox.SetValue(addRoll(random.randint(1, 20))))
+        btn.Bind(wx.EVT_BUTTON, lambda event: self.addRoll(20))
         innerBox.Add(btn, 0, wx.ALIGN_CENTER | wx.EXPAND | wx.ALL, 1)
 
         btn = wx.Button(self, 0, '100', style=wx.BU_EXACTFIT)
-        btn.Bind(wx.EVT_BUTTON, lambda event: totalBox.SetValue(addRoll(random.randint(1, 100))))
+        btn.Bind(wx.EVT_BUTTON, lambda event: self.addRoll(100))
         innerBox.Add(btn, 0, wx.ALIGN_CENTER | wx.EXPAND | wx.ALL, 1)
 
-        innerBox.Add(totalBox, 0, wx.ALIGN_CENTER | wx.EXPAND | wx.ALL, 1)
+        innerBox.Add(self.totalBox, 0, wx.ALIGN_CENTER | wx.EXPAND | wx.ALL, 1)
 
         btn = wx.Button(self, 0, 'C', style=wx.BU_EXACTFIT)
-        btn.Bind(wx.EVT_BUTTON, lambda event: totalBox.SetValue(''))
+        btn.Bind(wx.EVT_BUTTON, lambda event: self.totalBox.SetValue(''))
         innerBox.Add(btn, 0, wx.ALIGN_CENTER | wx.EXPAND | wx.ALL, 1)
 
         innerBox.Add(wx.Panel(self), 1, wx.ALIGN_CENTER | wx.EXPAND | wx.ALL, 1)
@@ -141,17 +141,53 @@ class MainFrame(wx.Frame):
         self.hasFocus = True
         self.Bind(wx.EVT_CLOSE, self.onClose)
 
-        idClose = wx.NewId()
-        idPreview = wx.NewId()
-        idCycle = wx.NewId()
-        self.Bind(wx.EVT_MENU, lambda event: self.Close(), id=idClose)
-        self.Bind(wx.EVT_MENU, lambda event: self.openPreview(), id=idPreview)
-        self.Bind(wx.EVT_MENU, lambda event: self.cycleUnits(), id=idCycle)
+        idClose = wx.NewId(); self.Bind(wx.EVT_MENU, lambda event: self.Close(), id=idClose)
+        idPreview = wx.NewId(); self.Bind(wx.EVT_MENU, lambda event: self.openPreview(), id=idPreview)
+        idCycle = wx.NewId(); self.Bind(wx.EVT_MENU, lambda event: self.cycleUnits(), id=idCycle)
+
+        idRollClear = wx.NewId(); self.Bind(wx.EVT_MENU, lambda event: self.totalBox.SetValue(''))
+        idRoll1 = wx.NewId(); self.Bind(wx.EVT_MENU, lambda event: self.addRoll(1, clear=True), id=idRoll1)
+        idRoll4 = wx.NewId(); self.Bind(wx.EVT_MENU, lambda event: self.addRoll(4, clear=True), id=idRoll4)
+        idRoll6 = wx.NewId(); self.Bind(wx.EVT_MENU, lambda event: self.addRoll(6, clear=True), id=idRoll6)
+        idRoll8 = wx.NewId(); self.Bind(wx.EVT_MENU, lambda event: self.addRoll(8, clear=True), id=idRoll8)
+        idRoll10 = wx.NewId(); self.Bind(wx.EVT_MENU, lambda event: self.addRoll(10, clear=True), id=idRoll10)
+        idRoll12 = wx.NewId(); self.Bind(wx.EVT_MENU, lambda event: self.addRoll(12, clear=True), id=idRoll12)
+        idRoll20 = wx.NewId(); self.Bind(wx.EVT_MENU, lambda event: self.addRoll(20, clear=True), id=idRoll20)
+        idRollAdv = wx.NewId(); self.Bind(wx.EVT_MENU, lambda event: self.addRoll(20, clear=True, advantage=1), id=idRollAdv)
+        idRollDis = wx.NewId(); self.Bind(wx.EVT_MENU, lambda event: self.addRoll(20, clear=True, advantage=-1), id=idRollDis)
+
+        idRollAdd1 = wx.NewId(); self.Bind(wx.EVT_MENU, lambda event: self.addRoll(1), id=idRollAdd1)
+        idRollAdd4 = wx.NewId(); self.Bind(wx.EVT_MENU, lambda event: self.addRoll(4), id=idRollAdd4)
+        idRollAdd6 = wx.NewId(); self.Bind(wx.EVT_MENU, lambda event: self.addRoll(6), id=idRollAdd6)
+        idRollAdd8 = wx.NewId(); self.Bind(wx.EVT_MENU, lambda event: self.addRoll(8), id=idRollAdd8)
+        idRollAdd10 = wx.NewId(); self.Bind(wx.EVT_MENU, lambda event: self.addRoll(10), id=idRollAdd10)
+        idRollAdd12 = wx.NewId(); self.Bind(wx.EVT_MENU, lambda event: self.addRoll(12), id=idRollAdd12)
+        idRollAdd20 = wx.NewId(); self.Bind(wx.EVT_MENU, lambda event: self.addRoll(20), id=idRollAdd20)
+
         accel_tbl = wx.AcceleratorTable([
             (wx.ACCEL_CTRL,  ord('Q'), idClose),
             (wx.ACCEL_CTRL,  ord('W'), idClose),
             (wx.ACCEL_NORMAL, ord(' '), idPreview),
-            (wx.ACCEL_NORMAL, wx.WXK_RETURN, idCycle)
+            (wx.ACCEL_NORMAL, wx.WXK_RETURN, idCycle),
+
+            (wx.ACCEL_NORMAL, ord('c'), idRollClear), # C for Clear
+            (wx.ACCEL_NORMAL, ord('1'), idRoll1),
+            (wx.ACCEL_NORMAL, ord('4'), idRoll4),
+            (wx.ACCEL_NORMAL, ord('6'), idRoll6),
+            (wx.ACCEL_NORMAL, ord('8'), idRoll8),
+            (wx.ACCEL_NORMAL, ord('0'), idRoll10),
+            (wx.ACCEL_NORMAL, ord('2'), idRoll12),
+            (wx.ACCEL_NORMAL, ord('s'), idRoll20), # S for Simple D20
+            (wx.ACCEL_NORMAL, ord('a'), idRollAdv), # A for Advantage
+            (wx.ACCEL_NORMAL, ord('d'), idRollDis), # D for Disadvantage
+
+            (wx.ACCEL_SHIFT, ord('1'), idRollAdd1),
+            (wx.ACCEL_SHIFT, ord('4'), idRollAdd4),
+            (wx.ACCEL_SHIFT, ord('6'), idRollAdd6),
+            (wx.ACCEL_SHIFT, ord('8'), idRollAdd8),
+            (wx.ACCEL_SHIFT, ord('0'), idRollAdd10),
+            (wx.ACCEL_SHIFT, ord('2'), idRollAdd12),
+            (wx.ACCEL_SHIFT, ord('s'), idRollAdd20)
         ])
         self.SetAcceleratorTable(accel_tbl)
 
@@ -291,7 +327,7 @@ class MainFrame(wx.Frame):
     # Note: these are actually removed when write() is called
     def removeImage(self, image):
         self.imagesToRemove.append(image)
-    
+
     def removeUnit(self, unit):
         self.units.remove(unit)
         if 'image' in unit:
@@ -388,6 +424,17 @@ class MainFrame(wx.Frame):
         for idx in selected:
             self.units[idx]['hp'] = max(self.units[idx]['hp'] - pts, 0)
         self.refreshMgmt()
+
+    def addRoll(self, dn, clear = False, advantage = 0):
+        v = int(self.totalBox.GetValue() or 0)
+        if clear: v = 0
+        result = random.randint(1, dn)
+        if advantage < 0:
+            result = min(random.randint(1, dn), result)
+        elif advantage > 0:
+            result = max(random.randint(1, dn), result)
+        v = v + result
+        self.totalBox.SetValue(str(v))
 
     def roll(self, n, dn):
         try:
