@@ -145,7 +145,7 @@ class MainFrame(wx.Frame):
         idPreview = wx.NewId(); self.Bind(wx.EVT_MENU, lambda event: self.openPreview(), id=idPreview)
         idCycle = wx.NewId(); self.Bind(wx.EVT_MENU, lambda event: self.cycleUnits(), id=idCycle)
 
-        idRollClear = wx.NewId(); self.Bind(wx.EVT_MENU, lambda event: self.totalBox.SetValue(''))
+        idRollClear = wx.NewId(); self.Bind(wx.EVT_MENU, lambda event: self.totalBox.SetValue(''), id=idRollClear)
         idRoll1 = wx.NewId(); self.Bind(wx.EVT_MENU, lambda event: self.addRoll(1, clear=True), id=idRoll1)
         idRoll4 = wx.NewId(); self.Bind(wx.EVT_MENU, lambda event: self.addRoll(4, clear=True), id=idRoll4)
         idRoll6 = wx.NewId(); self.Bind(wx.EVT_MENU, lambda event: self.addRoll(6, clear=True), id=idRoll6)
