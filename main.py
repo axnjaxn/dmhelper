@@ -65,6 +65,8 @@ class MainFrame(wx.Frame):
         innerBox.Add(wx.Panel(self), 1, wx.ALIGN_CENTER | wx.EXPAND | wx.ALL, 1)
         dmgBox = wx.TextCtrl(self, style=wx.TE_PROCESS_ENTER, size=(60, -1))
         dmgBox.Bind(wx.EVT_TEXT_ENTER, lambda event: self.doDamage(dmgBox.GetValue()))
+        dmgBox.Bind(wx.EVT_SET_FOCUS, self.disableNumberShortcuts)
+        dmgBox.Bind(wx.EVT_KILL_FOCUS, self.enableNumberShortcuts)
         innerBox.Add(dmgBox, 0, wx.ALIGN_CENTER | wx.EXPAND | wx.ALL, 1)
         rollBtn = wx.Button(self, 0, "Do damage")
         rollBtn.Bind(wx.EVT_BUTTON, lambda event: self.doDamage(dmgBox.GetValue()))
@@ -125,10 +127,14 @@ class MainFrame(wx.Frame):
         innerBox.Add(wx.Panel(self), 1, wx.ALIGN_CENTER | wx.EXPAND | wx.ALL, 1)
         rollBox1 = wx.TextCtrl(self, style=wx.TE_PROCESS_ENTER, size=(60, -1))
         rollBox1.Bind(wx.EVT_TEXT_ENTER, lambda event: self.roll(rollBox1.GetValue(), rollBox2.GetValue()))
+        rollBox1.Bind(wx.EVT_SET_FOCUS, self.disableNumberShortcuts)
+        rollBox1.Bind(wx.EVT_KILL_FOCUS, self.enableNumberShortcuts)
         innerBox.Add(rollBox1, 0, wx.ALIGN_CENTER | wx.EXPAND | wx.ALL, 1)
         innerBox.Add(wx.StaticText(self, 0, "d"), 0, wx.ALIGN_CENTER | wx.EXPAND | wx.ALL, 1)
         rollBox2 = wx.TextCtrl(self, style=wx.TE_PROCESS_ENTER, size=(60, -1))
         rollBox2.Bind(wx.EVT_TEXT_ENTER, lambda event: self.roll(rollBox1.GetValue(), rollBox2.GetValue()))
+        rollBox2.Bind(wx.EVT_SET_FOCUS, self.disableNumberShortcuts)
+        rollBox2.Bind(wx.EVT_KILL_FOCUS, self.enableNumberShortcuts)
         innerBox.Add(rollBox2, 0, wx.ALIGN_CENTER | wx.EXPAND | wx.ALL, 1)
         rollBtn = wx.Button(self, 0, "Roll")
         rollBtn.Bind(wx.EVT_BUTTON, lambda event: self.roll(rollBox1.GetValue(), rollBox2.GetValue()))
@@ -164,7 +170,7 @@ class MainFrame(wx.Frame):
         idRollAdd12 = wx.NewId(); self.Bind(wx.EVT_MENU, lambda event: self.addRoll(12), id=idRollAdd12)
         idRollAdd20 = wx.NewId(); self.Bind(wx.EVT_MENU, lambda event: self.addRoll(20), id=idRollAdd20)
 
-        accel_tbl = wx.AcceleratorTable([
+        self.accel_numbers = wx.AcceleratorTable([
             (wx.ACCEL_CTRL,  ord('Q'), idClose),
             (wx.ACCEL_CTRL,  ord('W'), idClose),
             (wx.ACCEL_NORMAL, ord(' '), idPreview),
@@ -186,9 +192,16 @@ class MainFrame(wx.Frame):
             (wx.ACCEL_NORMAL, ord('6'), idRollAdd6),
             (wx.ACCEL_NORMAL, ord('8'), idRollAdd8),
             (wx.ACCEL_NORMAL, ord('0'), idRollAdd10),
-            (wx.ACCEL_NORMAL, ord('2'), idRollAdd12),
+            (wx.ACCEL_NORMAL, ord('2'), idRollAdd12)
         ])
-        self.SetAcceleratorTable(accel_tbl)
+
+        self.accel_no_numbers = wx.AcceleratorTable([
+            (wx.ACCEL_CTRL,  ord('Q'), idClose),
+            (wx.ACCEL_CTRL,  ord('W'), idClose),
+            (wx.ACCEL_NORMAL, ord(' '), idPreview)
+        ])
+
+        self.SetAcceleratorTable(self.accel_numbers)
 
         self.read()
         self.refreshMgmt()
@@ -273,6 +286,14 @@ class MainFrame(wx.Frame):
         elif event.GetColumn() == 4: self.units.sort(key = lambda entry: entry['hp'], reverse = True)
         elif event.GetColumn() == 5: self.units.sort(key = lambda entry: entry['notes'])
         self.refreshMgmt()
+
+    def disableNumberShortcuts(self, event):
+        self.SetAcceleratorTable(self.accel_no_numbers)
+        event.Skip()
+
+    def enableNumberShortcuts(self, event):
+        self.SetAcceleratorTable(self.accel_numbers)
+        event.Skip()
 
     def cycleUnits(self):
         if len(self.units) == 0: return
