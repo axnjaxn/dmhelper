@@ -15,7 +15,7 @@ class ImagePreviewDialog(wx.Dialog):
 
         screen_size = wx.DisplaySize()
         image_size = self.bmp.GetSize()
-        scale = min(min((screen_size[0] - 20.0) / image_size[0], 0.5 * screen_size[1] / image_size[1]), 1.0)
+        scale = min(min((screen_size[0] - 20.0) / image_size[0], 0.75 * screen_size[1] / image_size[1]), 1.0)
         if scale < 1.0:
             image = self.bmp.ConvertToImage()
             image = image.Scale(int(scale * image_size[0]), int(scale * image_size[1]), wx.IMAGE_QUALITY_BICUBIC)
