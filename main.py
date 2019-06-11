@@ -121,8 +121,11 @@ class MainFrame(wx.Frame):
         innerBox.Add(self.totalBox, 0, wx.ALIGN_CENTER | wx.EXPAND | wx.ALL, 1)
 
         btn = wx.Button(self, 0, 'C', style=wx.BU_EXACTFIT)
-        btn.Bind(wx.EVT_BUTTON, lambda event: self.totalBox.SetValue(''))
+        btn.Bind(wx.EVT_BUTTON, lambda event: self.clearRoll())
         innerBox.Add(btn, 0, wx.ALIGN_CENTER | wx.EXPAND | wx.ALL, 1)
+
+        self.rollType = wx.StaticText(self, 0, '')
+        innerBox.Add(self.rollType, 0, wx.ALIGN_CENTER | wx.EXPAND | wx.ALL, 1)
 
         innerBox.Add(wx.Panel(self), 1, wx.ALIGN_CENTER | wx.EXPAND | wx.ALL, 1)
         rollBox1 = wx.TextCtrl(self, style=wx.TE_PROCESS_ENTER, size=(60, -1))
@@ -144,6 +147,8 @@ class MainFrame(wx.Frame):
 
         self.SetSizer(outerBox)
 
+        self.clearRoll()
+
         self.hasFocus = True
         self.Bind(wx.EVT_CLOSE, self.onClose)
 
@@ -151,7 +156,7 @@ class MainFrame(wx.Frame):
         idPreview = wx.NewId(); self.Bind(wx.EVT_MENU, lambda event: self.openPreview(), id=idPreview)
         idCycle = wx.NewId(); self.Bind(wx.EVT_MENU, lambda event: self.cycleUnits(), id=idCycle)
 
-        idRollClear = wx.NewId(); self.Bind(wx.EVT_MENU, lambda event: self.totalBox.SetValue(''), id=idRollClear)
+        idRollClear = wx.NewId(); self.Bind(wx.EVT_MENU, lambda event: self.clearRoll(), id=idRollClear)
         idRoll1 = wx.NewId(); self.Bind(wx.EVT_MENU, lambda event: self.addRoll(1, clear=True), id=idRoll1)
         idRoll4 = wx.NewId(); self.Bind(wx.EVT_MENU, lambda event: self.addRoll(4, clear=True), id=idRoll4)
         idRoll6 = wx.NewId(); self.Bind(wx.EVT_MENU, lambda event: self.addRoll(6, clear=True), id=idRoll6)
@@ -445,14 +450,41 @@ class MainFrame(wx.Frame):
             self.units[idx]['hp'] = max(self.units[idx]['hp'] - pts, 0)
         self.refreshMgmt()
 
+    def clearRoll(self):
+        self.totalBox.SetValue('')
+        self.rollType.SetLabel('')
+        self.rolls = {}
+
     def addRoll(self, dn, clear = False, advantage = 0):
+        self.rollType.SetLabel('%d' % (10 ** random.randint(0, 4)))
+
         v = int(self.totalBox.GetValue() or 0)
-        if clear: v = 0
+        if clear:
+            v = 0
+            self.rolls = {}
+
         result = random.randint(1, dn)
         if advantage < 0:
             result = min(random.randint(1, dn), result)
+            self.rollType.SetLabel('Disadvantage')
         elif advantage > 0:
             result = max(random.randint(1, dn), result)
+            self.rollType.SetLabel('Advantage')
+        else:
+            if dn not in self.rolls: self.rolls[dn] = 1
+            else: self.rolls[dn] = self.rolls[dn] + 1
+
+            s = ''
+            keys = sorted(self.rolls.keys(), reverse = True)
+            for key in keys:
+                n = self.rolls[key]
+                if key != 1: word = '%dd%d' % (n, key)
+                else: word = '%d' % (n)
+
+                if s is '': s = word
+                else: s = s + ' + ' + word
+            self.rollType.SetLabel(s)
+
         v = v + result
         self.totalBox.SetValue(str(v))
 
