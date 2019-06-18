@@ -137,7 +137,7 @@ class EditUnitDialog(wx.Dialog):
                 if bmp.SaveFile(fn, wx.BITMAP_TYPE_PNG):
                     self.image = fn
                     self.bmp = bmp
-                    self.rebuild()
+                    self.rebuild(unit=self.dumpUnit())
                 else:
                     raise Exception('Could not save %s' % (fn))
             cb.Close()
@@ -151,7 +151,8 @@ class EditUnitDialog(wx.Dialog):
         self.image = None
         self.bmp = None
         self.imageFrame.Hide()
-        self.rebuild()
+
+        self.rebuild(unit=self.dumpUnit())
 
     def saveUnit(self):
         udict = UnitDict()
@@ -192,6 +193,20 @@ class EditUnitDialog(wx.Dialog):
     def OK(self):
         if self.image is not None: self.save_image = True
         if self.isValid(): self.EndModal(wx.ID_OK)
+
+    def dumpUnit(self):
+        unit = {
+            'name': self.nameBox.GetValue(),
+            'pc': self.pcBox.GetValue(),
+            'dex': self.dexBox.GetValue(),
+            'initiative': self.initBox.GetValue(),
+            'ac': self.acBox.GetValue(),
+            'hp': self.hpBox.GetValue(),
+            'notes': self.notesBox.GetValue()
+        }
+        if self.image is not None:
+            unit['image'] = self.image
+        return unit
 
     def getUnit(self):
         unit =  {
