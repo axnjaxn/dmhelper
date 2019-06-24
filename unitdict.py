@@ -60,6 +60,8 @@ class UnitDictDialog(wx.Dialog):
         okBtn.Bind(wx.EVT_BUTTON, self.activate)
         outerBox.Add(okBtn, 0, wx.ALIGN_CENTER | wx.EXPAND | wx.ALL, 1)
 
+        self.SetMinSize((0, 600))
+
         self.SetSizer(outerBox)
         self.Fit()
         self.Layout()
